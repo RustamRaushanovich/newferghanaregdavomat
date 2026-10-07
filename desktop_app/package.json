@@ -1,0 +1,21 @@
+{
+  "name": "ferghana-davomat-desktop",
+  "version": "1.0.0",
+  "description": "Ferghana Reg Davomat va Telegram Desktop Birlashtirilgan Platformasi",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "keywords": [
+    "davomat",
+    "telegram",
+    "electron",
+    "desktop"
+  ],
+  "author": "RustamRaushanovich",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.2.0"
+  }
+}

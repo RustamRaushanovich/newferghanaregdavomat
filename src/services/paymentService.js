@@ -173,22 +173,27 @@ async function handleReceiptSubmission(ctx) {
 
     if (duplicate) {
         ctx.session.waiting_receipt = false;
+        const timeInfo = duplicate.submitted_at || duplicate.resolved_at || 'avval';
+        const firstSender = duplicate.sender_name || 'Noma\'lum';
+        const firstSchool = duplicate.school || 'Maktab';
+
         if (duplicate.status === 'approved') {
             await ctx.replyWithHTML(
                 '❌ <b>DIQQAT: TO\'LOV CHEKI QABUL QILINMADI!</b>\n\n' +
-                'Ushbu to\'lov cheki tizimda allaqachon ro\'yxatga olingan va tasdiqlangan!\n\n' +
-                '⚠️ <i>Iltimos, faqat o\'zingiz amalga oshirgan yangi va haqiqiy to\'lov kvitansiyasini yuboring.</i>'
+                `Ushbu to'lov cheki <b>${timeInfo}</b> vaqtida tizimda allaqachon ro'yxatga olingan va tasdiqlangan!\n\n` +
+                `👤 <b>Birinchi marta topshirgan:</b> ${firstSender} (${firstSchool})\n\n` +
+                '⚠️ <i>Qayta ishlatilgan yoki o\'zganing cheki qabul qilinmaydi. Iltimos, faqat o\'zingiz amalga oshirgan yangi va haqiqiy to\'lov kvitansiyasini yuboring.</i>'
             );
 
             // Alert superadmins about suspected fake check
             const alertMsg = 
                 '🚨 <b>SOXTA / QAYTA ISHLATILGAN CHEK ANIQLANDI!</b>\n\n' +
-                '👤 <b>Kim yubordi:</b> ' + name + ' (' + userName + ')\n' +
+                '👤 <b>Qayta yuborgan:</b> ' + name + ' (' + userName + ')\n' +
                 '🆔 <b>Telegram ID:</b> <code>' + uid + '</code>\n' +
                 '🏫 <b>Maktab:</b> ' + school + '\n' +
                 '📞 <b>Tel:</b> ' + phone + '\n\n' +
-                '⚠️ <b>Avvalgi to\'lovchi:</b> ' + duplicate.sender_name + ' (' + duplicate.school + ')\n' +
-                '📅 <b>Birinchi marta topshirilgan vaqt:</b> ' + duplicate.submitted_at;
+                '⚠️ <b>Asl to\'lovchi:</b> ' + duplicate.sender_name + ' (' + duplicate.school + ')\n' +
+                '📅 <b>Tasdiqlangan vaqti:</b> ' + timeInfo;
 
             for (const adminId of (config.SUPER_ADMIN_IDS || [65002404])) {
                 try {
@@ -200,10 +205,17 @@ async function handleReceiptSubmission(ctx) {
                 } catch (e) {}
             }
             return;
+        } else if (duplicate.status === 'fake_rejected') {
+            await ctx.replyWithHTML(
+                '❌ <b>DIQQAT: USHBU CHEK ILGARI RAD ETILGAN!</b>\n\n' +
+                `Ushbu to'lov kvitansiyasi <b>${timeInfo}</b> vaqtida yuborilgan va ma'muriyat tomonidan rad etilgan (soxta chek).\n\n` +
+                '⚠️ <i>Iltimos, faqat o\'zingiz amalga oshirgan yangi va haqiqiy to\'lov kvitansiyasini yuboring.</i>'
+            );
+            return;
         } else if (duplicate.status === 'pending') {
             await ctx.replyWithHTML(
                 '⏳ <b>DIQQAT: USHBU CHEK ALLAQACHON YUBORILGAN!</b>\n\n' +
-                'Siz yuborgan ushbu to\'lov cheki hozirda adminlar tomonidan ko\'rib chiqilmoqda.\n\n' +
+                `Siz yoki boshqa foydalanuvchi ushbu chekni <b>${timeInfo}</b> vaqtida topshirgan. Hozirda adminlar tomonidan ko'rib chiqilmoqda.\n\n` +
                 '⚠️ <i>Qayta-qayta yuborishingiz shart emas. Chek tasdiqlanguniga qadar bugungi davomatni erkin kiritishingiz mumkin.</i>'
             );
             return;

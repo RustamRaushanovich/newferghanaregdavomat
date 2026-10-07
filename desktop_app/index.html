@@ -9,11 +9,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Internet Status Notification Banner -->
+    <div id="netStatusBanner" class="net-status-banner net-online" style="display:none;">
+        <span id="netStatusText"><i class="fas fa-wifi"></i> Internet tarmog'iga ulandi</span>
+    </div>
+
+    <!-- Fullscreen Offline Warning Overlay -->
+    <div id="offlineOverlay" class="offline-overlay" style="display:none;">
+        <div class="offline-card">
+            <div class="offline-icon"><i class="fas fa-wifi-slash"></i></div>
+            <h2>Internet Aloqasi Uzildi!</h2>
+            <p>Iltimos, Wi-Fi yoki Kabel tarmog'ingizni tekshiring. Internet uzildi! Internetga ulanganingizdan so'ng ma'lumotlar avtomatik ravishda yuboriladi va sahifa qayta yangilanadi.</p>
+            <button id="btnRetryNet" class="retry-net-btn">
+                <i class="fas fa-sync-alt"></i> Qayta Tekshirish
+            </button>
+        </div>
+    </div>
+
     <!-- Top Glassmorphic Titlebar & Quick Controls -->
     <header class="titlebar">
         <div class="titlebar-left">
             <img src="../assets/main_logo.jpg" class="app-logo" alt="Logo" onerror="this.src='../assets/logo.png'">
             <span class="app-name">DAVOMAT <span class="app-badge">DESKTOP PRO</span></span>
+            <span id="netIndicator" class="net-indicator net-ind-online" title="Internet holati"><i class="fas fa-signal"></i> Online</span>
         </div>
 
         <div class="titlebar-center">

@@ -1,4 +1,4 @@
-// Renderer Script for Davomat & Telegram Desktop Split View
+// Renderer Script for Davomat & Telegram Desktop Split View & Network Monitoring
 
 document.addEventListener('DOMContentLoaded', () => {
     // Window control buttons
@@ -31,6 +31,89 @@ document.addEventListener('DOMContentLoaded', () => {
     const homeDavomatBtn = document.getElementById('homeDavomatBtn');
     const reloadTgBtn = document.getElementById('reloadTgBtn');
     const switchTgVersionBtn = document.getElementById('switchTgVersionBtn');
+
+    // Network Status Elements
+    const netIndicator = document.getElementById('netIndicator');
+    const netStatusBanner = document.getElementById('netStatusBanner');
+    const netStatusText = document.getElementById('netStatusText');
+    const offlineOverlay = document.getElementById('offlineOverlay');
+    const btnRetryNet = document.getElementById('btnRetryNet');
+
+    let isOnline = navigator.onLine;
+
+    function showBanner(msg, isOnlineStatus) {
+        if (!netStatusBanner || !netStatusText) return;
+        netStatusText.innerHTML = msg;
+        netStatusBanner.className = 'net-status-banner ' + (isOnlineStatus ? 'net-online' : 'net-offline');
+        netStatusBanner.style.display = 'block';
+        setTimeout(() => {
+            if (isOnlineStatus) netStatusBanner.style.display = 'none';
+        }, 4000);
+    }
+
+    function updateNetworkStatus(onlineState) {
+        isOnline = onlineState;
+
+        if (onlineState) {
+            if (netIndicator) {
+                netIndicator.className = 'net-indicator net-ind-online';
+                netIndicator.innerHTML = '<i class="fas fa-signal"></i> Online';
+            }
+            if (offlineOverlay) offlineOverlay.style.display = 'none';
+
+            showBanner('<i class="fas fa-wifi"></i> Internetga ulandi! Ma\'lumotlar yuborilmoqda...', true);
+
+            // Auto reload & resync webviews when internet comes back
+            try {
+                if (davomatWebview) davomatWebview.reload();
+                if (telegramWebview) telegramWebview.reload();
+            } catch(e){}
+        } else {
+            if (netIndicator) {
+                netIndicator.className = 'net-indicator net-ind-offline';
+                netIndicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline (Internet Yo\'q)';
+            }
+            if (offlineOverlay) offlineOverlay.style.display = 'flex';
+
+            showBanner('<i class="fas fa-exclamation-triangle"></i> Internet uzildi! Iltimos, internetga ulaning.', false);
+        }
+    }
+
+    // Ping test for robust connection check
+    async function checkInternetConnection() {
+        try {
+            const res = await fetch('https://newferghanaregdavomat.vercel.app/api/health', {
+                method: 'HEAD',
+                cache: 'no-store'
+            });
+            if (res.ok || res.status < 500) {
+                if (!isOnline) updateNetworkStatus(true);
+            } else {
+                if (isOnline) updateNetworkStatus(false);
+            }
+        } catch (e) {
+            if (navigator.onLine === false) {
+                if (isOnline) updateNetworkStatus(false);
+            }
+        }
+    }
+
+    window.addEventListener('online', () => updateNetworkStatus(true));
+    window.addEventListener('offline', () => updateNetworkStatus(false));
+
+    if (btnRetryNet) {
+        btnRetryNet.addEventListener('click', () => {
+            btnRetryNet.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tekshirilmoqda...';
+            checkInternetConnection().finally(() => {
+                setTimeout(() => {
+                    btnRetryNet.innerHTML = '<i class="fas fa-sync-alt"></i> Qayta Tekshirish';
+                }, 800);
+            });
+        });
+    }
+
+    // Periodically check internet connection every 10 seconds
+    setInterval(checkInternetConnection, 10000);
 
     // Layout presets
     function setPreset(preset) {
@@ -90,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = true;
         splitter.classList.add('dragging');
         document.body.style.cursor = 'col-resize';
-        // Prevent webview overlay from capturing mouse while dragging
         davomatWebview.style.pointerEvents = 'none';
         telegramWebview.style.pointerEvents = 'none';
     });
@@ -101,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const workspaceWidth = workspace.clientWidth;
         let leftWidth = e.clientX;
 
-        // Enforce minimum width constraints
         if (leftWidth < 300) leftWidth = 300;
         if (workspaceWidth - leftWidth < 260) leftWidth = workspaceWidth - 260;
 
@@ -121,4 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             telegramWebview.style.pointerEvents = 'auto';
         }
     });
+
+    // Initial check
+    updateNetworkStatus(navigator.onLine);
 });

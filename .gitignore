@@ -1,0 +1,36 @@
+# ===============================================
+# Farg'ona Viloyat Davomat Tizimi - .gitignore
+# GitHub ва Render.com учун хавфсизлик созламалари
+# ===============================================
+
+# Атроф-муҳит ўзгарувчилари ва махфий калитлар
+.env
+.env.local
+.env.production
+
+# Node.js кутубхоналари ва журналлар
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+logs/
+
+# Маҳаллий маълумотлар базалари ва кэш
+*.db
+*.sqlite
+*.sqlite3
+src/database/davomat.db
+
+# Конфиденциал ва шахсий маълумотли файллар (PII protection)
+*.xlsx
+*.xls
+*.csv
+src/database/users_db.json
+src/database/schools.json.backup
+src/database/pro_users.json
+src/database/access_users.json
+
+# Тизим ва ортиқча файллар
+.DS_Store
+Thumbs.db

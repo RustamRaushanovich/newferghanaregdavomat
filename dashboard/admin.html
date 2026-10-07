@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ferghana Davomat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=2.2">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--glass);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--glass);
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #94a3b8;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        textarea,
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-on {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid #22c55e;
+        }
+
+        .status-off {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        .stats-val {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .quick-link {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            font-size: 0.85rem;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .quick-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            background: #1e293b;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png"></head>
+
+<body>
+    <!-- NAVBAR HUDDI BOSHQA SAHIFALARDA BO'LGANI KABI -->
+    
+            
+            <nav class="navbar">
+    <div class="nav-branding">
+        <a href="index.html" style="text-decoration:none; display:flex; align-items:center;">
+            <img src="/assets/main_logo.jpg" onerror="this.src='/assets/logo.png'" class="main-top-logo" alt="Asosiy Logo" style="margin-right: 10px;">
+            <h3 style="color:white; margin:0; font-size:1.2rem; text-shadow:0 2px 4px rgba(0,0,0,0.5);">DAVOMAT</h3>
+        </a>
+    </div>
+    <div class="nav-links">
+        <a href="index.html" class="nav-item "><i class="fas fa-home"></i> <span>Asosiy</span></a>
+        <a href="davomat.html" class="nav-item "><i class="fas fa-edit"></i> <span>Davomat</span></a>
+        <a href="inspektor.html" class="nav-item "><i class="fas fa-user-shield"></i> <span>Inspektor</span></a>
+        <a href="xorij.html" class="nav-item "><i class="fas fa-globe"></i> <span>Xorij</span></a>
+        <a href="dashboard.html" class="nav-item "><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+        <a href="admin.html" class="nav-item active"><i class="fas fa-cog"></i> <span>Admin</span></a>
+        <a href="about.html?tab=hujjatlar" class="nav-item"><i class="fas fa-file-contract"></i> <span>Hujjatlar</span></a>
+        <a href="about.html" class="nav-item "><i class="fas fa-info-circle"></i> <span>Me'yoriy hujjatlar</span></a>
+        <a href="oferta.html" class="nav-item" style="color:#facc15;"><i class="fas fa-file-signature" style="color:#facc15;"></i> <span style="color:#facc15; font-weight:700;">Ommaviy Oferta</span></a>
+        <a href="javascript:void(0)" onclick="adminLogout()" class="nav-item" style="color:#ef4444 !important;"><i class="fas fa-sign-out-alt" style="color:#ef4444;"></i> <span style="color:#ef4444; font-weight:700;">Chiqish</span></a>
+    </div>
+</nav>
+
+
+    <div class="container" style="padding-top: 80px;">
+        <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; flex-wrap:wrap; gap:15px;">
+            <h1 style="color:#e2e8f0; margin:0;"><i class="fas fa-tools" style="color:var(--primary)"></i> Superadmin Boshqaruvi</h1>
+            <div id="userInfo" style="display:flex; align-items:center; gap:12px;">
+                <span id="adminName" style="font-weight: 600; color:#facc15; background:rgba(250,204,21,0.1); padding:6px 14px; border-radius:20px; border:1px solid rgba(250,204,21,0.3); font-size:0.9rem;"><i class="fas fa-crown"></i> Super Admin</span>
+                <button onclick="adminLogout()" class="btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 8px 18px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4); transition: 0.2s;">
+                    <i class="fas fa-sign-out-alt"></i> Chiqish
+                </button>
+            </div>
+        </div>
+
+
+        <div class="grid">
+            
+            <!-- Meyoriy Hujjatlar -->
+            <div class="card" style="grid-column: 1 / -1; border-color:#10b981; background:rgba(16, 185, 129, 0.05);">
+                <h3 style="color:#10b981;"><i class="fas fa-file-contract"></i> Me'yoriy Hujjatlarni Yuklash</h3>
+                <form id="docsForm" onsubmit="uploadDocument(event)" style="display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap; margin-top:15px;">
+                    <div style="flex:2; min-width:250px;">
+                        <label style="color:#94a3b8; font-size:0.85rem;">Hujjat nomi va qisqacha izohi (Kimlar uchunligi)</label>
+                        <input type="text" id="docTitle" required placeholder="Masalan: 301-sonli Vazir buyrug'i (Davomat bo'yicha)" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:white; margin-top:5px; font-family:sans-serif;">
+                    </div>
+                    <div style="flex:1; min-width:200px;">
+                        <label style="color:#94a3b8; font-size:0.85rem;">Hujjat (PDF/Doc/Rasm)</label>
+                        <input type="file" id="docFile" required style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:white; margin-top:5px;">
+                    </div>
+                    <button type="submit" class="btn" style="background:#10b981; padding:10px 20px;"><i class="fas fa-upload"></i> Saytga e'lon qilish</button>
+                </form>
+                <div style="margin-top: 15px; font-size: 0.82rem; color: #94a3b8;">
+                    Yuklangan hujjatlar barcha maktablar uchun "Biz haqimizda" (Me'yoriy Hujjatlar) bo'limida yuklab olish uchun darhol ochiq-oshkora tarzda e'lon qilinadi.
+                </div>
+            </div>
+
+            <!-- System Controls -->
+            <div class="card">
+                <h3><i class="fas fa-cogs"></i> Tizim Sozlamalari</h3>
+
+                <div class="toggle-container">
+                    <div>
+                        <div style="font-weight: 600;">Ta'til rejimi (Holiday)</div>
+                        <div style="font-size: 0.8rem; color: #64748b;">Bot xabarlarini to'xtatadi</div>
+                    </div>
+                    <button id="toggleVacation" class="btn btn-danger">O'chirilgan</button>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div style="font-weight: 600;">Manzil yig'ish</div>
+                        <div style="font-size: 0.8rem; color: #64748b;">Barcha school koordinatalari</div>
+                    </div>
+                    <button id="toggleLocation" class="btn btn-success">Yoqilgan</button>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div style="font-weight: 600;">Geolokatsiya tekshiruvi</div>
+                        <div style="font-size: 0.8rem; color: #64748b;">Kiritishda joylashuvni talab qilish</div>
+                    </div>
+                    <button id="toggleGeoCheck" class="btn btn-danger">O'chirilgan</button>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div style="font-weight: 600;">⚠️ Texnik ishlar (Maintenance)</div>
+                        <div style="font-size: 0.8rem; color: #64748b;">Dashboardni vaqtincha yopish</div>
+                    </div>
+                    <button id="toggleMaintenance" class="btn btn-danger">O'chirilgan</button>
+                </div>
+            </div>
+
+            <!-- Broadcast -->
+            <div class="card">
+                <h3><i class="fas fa-bullhorn"></i> Xabar Yuborish (Broadcasting)</h3>
+                <form id="broadcastForm">
+                    <div class="form-group">
+                        <label>Kimga:</label>
+                        <select id="broadcastTarget">
+                            <option value="all">Barcha foydalanuvchilar</option>
+                            <option value="inspectors">Faqat mas'ullar (Maktab/Tuman)</option>
+                            <option value="parents">Faqat ota-onalar</option>
+                        </select>
+                    </div>
+                                        <div class="form-group">
+                        <label>Xabar matni (HTML):</label>
+                        <textarea id="broadcastText" rows="4" placeholder="Xabaringizni yozing..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-upload"></i> Fayl biriktirish (PDF/Rasm):</label>
+                        <input type="file" id="broadcastFile" style="width:100%; padding:10px; border-radius:12px; border:1px dashed rgba(255,255,255,0.1); background:rgba(0,0,0,0.1); color:white;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-paper-plane"></i> Xabarni yuborish
+                    </button>
+                </form>
+            </div>
+
+            
+
+            <!-- Metrics -->
+            <div class="card">
+                <h3><i class="fas fa-chart-pie"></i> Tizim Statistikasi</h3>
+                <div class="stats-item">
+                    <span>Jami TG foydalanuvchilar:</span>
+                    <span class="stats-val" id="totalUsers">---</span>
+                </div>
+                <div class="stats-item">
+                    <span>Ota-onalar soni:</span>
+                    <span class="stats-val" id="totalParents">---</span>
+                </div>
+                <div class="stats-item">
+                    <span>PRO obunachilar:</span>
+                    <span class="stats-val" id="totalPro">---</span>
+                </div>
+                <div class="stats-item">
+                    <span>Bugun kiritgan maktablar:</span>
+                    <span class="stats-val" id="todayEntries">---</span>
+                </div>
+                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 15px 0;">
+                <div class="stats-item">
+                    <span>Server holati:</span>
+                    <span class="status-badge status-on">ONLINE</span>
+                </div>
+                <div class="stats-item">
+                    <span>Baza holati (Postgres):</span>
+                    <span class="status-badge status-on" id="dbStatus">ULANGAN</span>
+                </div>
+            </div>
+
+            <!-- Live activity logs -->
+            <div class="card">
+                <h3><i class="fas fa-list-ul"></i> Oxirgi Amallar (Logs)</h3>
+                <div id="logContainer"
+                    style="font-size: 0.8rem; height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px; font-family: monospace; color: #94a3b8;">
+                    <div style="color: #4ade80;">[SYSTEM] Admin panel yuklandi...</div>
+                    <div>[API] Sozlamalar muvaffaqiyatli olindi.</div>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 10px; width: 100%; font-size: 0.8rem;"
+                    onclick="refreshLogs()">
+                    <i class="fas fa-sync-alt"></i> Yangilash
+                </button>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="card">
+                <h3><i class="fas fa-link"></i> Tezkor Havolalar</h3>
+                <div class="quick-links">
+                    <a href="#subscriptionsManagerCard" class="quick-link"><i class="fas fa-calendar-check" style="color:#38bdf8;"></i><br>Obunalar / Maktablar</a>
+                    <a href="#receiptsCard" class="quick-link"><i class="fas fa-receipt" style="color:#10b981;"></i><br>To'lov Cheklari</a>
+                    <a href="inspektor.html" class="quick-link"><i class="fas fa-user-shield"></i><br>Inspektorlar</a>
+                    <a href="dashboard.html?tab=reports" class="quick-link"><i class="fas fa-file-excel"></i><br>Hisobotlar</a>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: #64748b; text-align: center;">
+                    Boshqa barcha funksiyalar Botdagi Admin Panelda mavjud.
+                </div>
+            </div>
+            
+            <!-- Favqulodda: Maktabga va Foydalanuvchiga Qo'lda Ruxsat Berish Card -->
+            <div class="card" id="proManagerCard">
+                <h3><i class="fas fa-shield-alt" style="color: #38bdf8;"></i> Favqulodda: Qo'lda Ruxsat / Limit Berish</h3>
+                <div style="background:rgba(56,189,248,0.08); border-left:3px solid #38bdf8; padding:12px 14px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#cbd5e1;">
+                    <i class="fas fa-info-circle"></i> To'lov avtomatik ochmay qolsa yoki favqulodda holatda, to'g'ridan-to'g'ri <b>Tuman va Maktabni tanlab</b> yoki <b>telefon raqam orqali</b> 1 oylik limit qo'shib berishingiz mumkin.
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    <button type="button" id="tabBySchoolBtn" onclick="switchManualMode('school')" class="btn btn-primary" style="flex:1; padding:6px 10px; font-size:0.8rem;">
+                        <i class="fas fa-school"></i> Maktab bo'yicha
+                    </button>
+                    <button type="button" id="tabByPhoneBtn" onclick="switchManualMode('phone')" class="btn" style="flex:1; padding:6px 10px; font-size:0.8rem; background:rgba(255,255,255,0.08); color:#cbd5e1;">
+                        <i class="fas fa-phone"></i> Telefon bo'yicha
+                    </button>
+                </div>
+
+                <!-- 1. Maktab bo'yicha ruxsat -->
+                <div id="manualSchoolBlock">
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#94a3b8;">Tuman / Shahar:</label>
+                        <select id="manualDistrict" onchange="loadManualSchools()" style="background:rgba(15,23,42,0.8); border:1px solid var(--glass-border); color:white; padding:10px; border-radius:12px; width:100%;">
+                            <option value="">-- Tumanni tanlang --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#94a3b8;">Maktab nomi:</label>
+                        <select id="manualSchool" style="background:rgba(15,23,42,0.8); border:1px solid var(--glass-border); color:white; padding:10px; border-radius:12px; width:100%;">
+                            <option value="">-- Avval tumanni tanlang --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. Telefon bo'yicha ruxsat -->
+                <div id="manualPhoneBlock" style="display:none;">
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#94a3b8;">Foydalanuvchi telefoni:</label>
+                        <input type="tel" id="proPhone" placeholder="998901234567" style="background:rgba(15,23,42,0.8); border:1px solid var(--glass-border); color:white; padding:10px; border-radius:12px; width:100%;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#94a3b8;">Ruxsat turi:</label>
+                    <select id="manualAccessType" style="background:rgba(15,23,42,0.8); border:1px solid var(--glass-border); color:white; padding:10px; border-radius:12px; width:100%;">
+                        <option value="access" selected>✅ Standart Davomat Ruxsati</option>
+                        <option value="pro">👑 PRO Rejim (Barcha imkoniyatlar)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#94a3b8;">Muddat:</label>
+                    <select id="manualMonths" style="background:rgba(15,23,42,0.8); border:1px solid var(--glass-border); color:white; padding:10px; border-radius:12px; width:100%;">
+                        <option value="1" selected>1 oy muddat</option>
+                        <option value="2">2 oy muddat</option>
+                        <option value="3">3 oy muddat</option>
+                        <option value="6">6 oy muddat</option>
+                        <option value="12">1 yil muddat</option>
+                    </select>
+                </div>
+                <button onclick="submitManualAccess()" class="btn btn-primary" style="width:100%; background:linear-gradient(135deg, #0284c7, #0369a1); border:none; box-shadow:0 8px 20px rgba(2,132,199,0.3);">
+                    <i class="fas fa-bolt"></i> Ruxsatni Darhol Faollashtirish
+                </button>
+            </div>
+
+            <!-- Database Backup Section -->
+            <div class="card" id="dbBackupCard">
+                <h3><i class="fas fa-database"></i> Baza ma'lumotlarini yuklab olish</h3>
+                <div style="background:rgba(16,185,129,0.05); padding:15px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#94a3b8;">
+                    <i class="fas fa-shield-alt"></i> Ushbu funksiya faqat <b>Asosiy Admin</b> (R.R. Turdiyev) uchun ishlayди. 
+                    Barcha davomat, xorijiy o'quvchilar ва Telegram foydalanuvchilarini JSON formatda saqlab olish imkoniyati.
+                </div>
+                <button onclick="downloadBackup()" class="btn btn-primary" style="width:100%; background: #10b981; border: none; box-shadow: 0 10px 20px rgba(16,185,129,0.2);">
+                    <i class="fas fa-download"></i> Ma'lumotlarni saqlash (Backup)
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Maktablar va Foydalanuvchilar To'lov / Obuna Boshqaruvi Card -->
+        <div class="card" id="subscriptionsManagerCard" style="margin-top: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h3 style="margin: 0; color: #f8fafc; font-size: 1.25rem;">
+                        <i class="fas fa-calendar-check" style="color: #38bdf8;"></i> Maktablar va Foydalanuvchilar To'lov / Obuna Boshqaruvi
+                    </h3>
+                    <p style="margin: 5px 0 0; font-size: 0.85rem; color: #94a3b8;">
+                        Hududlar bo'yicha aktiv va to'lov qilgan maktablarni ko'rish, ortiqcha berilgan limitlarni to'g'rilash va muddatlarini tahrirlash.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="loadSubscriptions()" style="padding: 8px 15px; font-size: 0.85rem;">
+                        <i class="fas fa-sync-alt"></i> Yangilash
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter and Search Bar -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; background: rgba(15,23,42,0.6); padding: 16px; border-radius: 16px; border: 1px solid var(--glass-border);">
+                <div>
+                    <label style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; display: block;">📍 Hudud (Tuman/Shahar):</label>
+                    <select id="subDistrictFilter" onchange="renderSubscriptions()" style="background: rgba(15,23,42,0.9); border: 1px solid var(--glass-border); color: white; padding: 9px; border-radius: 10px; font-size: 0.85rem; width: 100%;">
+                        <option value="">-- Barcha Hududlar --</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; display: block;">⚡ Holati:</label>
+                    <select id="subStatusFilter" onchange="renderSubscriptions()" style="background: rgba(15,23,42,0.9); border: 1px solid var(--glass-border); color: white; padding: 9px; border-radius: 10px; font-size: 0.85rem; width: 100%;">
+                        <option value="all">Barchasi</option>
+                        <option value="active" selected>✅ Faol obunalar</option>
+                        <option value="excessive">⚠️ Ortiqcha limit berilganlar (>35 kun)</option>
+                        <option value="expired">❌ Muddati tugaganlar</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; display: block;">🔍 Qidiruv (Maktab / F.I.SH / Tel):</label>
+                    <input type="text" id="subSearchInput" oninput="renderSubscriptions()" placeholder="Masalan: 15-maktab yoki 901234567" style="background: rgba(15,23,42,0.9); border: 1px solid var(--glass-border); color: white; padding: 9px; border-radius: 10px; font-size: 0.85rem; width: 100%;">
+                </div>
+            </div>
+
+            <!-- Quick Stats Summary -->
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>
+                    <div>
+                        <div style="font-size: 0.75rem; color: #94a3b8;">Faol Maktablar</div>
+                        <div id="statActiveCount" style="font-size: 1.1rem; font-weight: 700; color: #34d399;">0</div>
+                    </div>
+                </div>
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.2rem;"></i>
+                    <div>
+                        <div style="font-size: 0.75rem; color: #94a3b8;">Ortiqcha Limit (>35 kun)</div>
+                        <div id="statExcessiveCount" style="font-size: 1.1rem; font-weight: 700; color: #fbbf24;">0</div>
+                    </div>
+                </div>
+                <div style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-users" style="color: #818cf8; font-size: 1.2rem;"></i>
+                    <div>
+                        <div style="font-size: 0.75rem; color: #94a3b8;">Jami Ko'rsatilayotgan</div>
+                        <div id="statTotalShowing" style="font-size: 1.1rem; font-weight: 700; color: #c7d2fe;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div style="overflow-x: auto; border-radius: 14px; border: 1px solid var(--glass-border);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.06); border-bottom: 1px solid var(--glass-border); color: #cbd5e1;">
+                            <th style="padding: 12px 14px;">Hudud va Maktab</th>
+                            <th style="padding: 12px 14px;">Biriktirilgan Foydalanuvchi</th>
+                            <th style="padding: 12px 14px;">Ruxsat turi</th>
+                            <th style="padding: 12px 14px;">Tugash sanasi</th>
+                            <th style="padding: 12px 14px;">Qolgan muddat</th>
+                            <th style="padding: 12px 14px; text-align: center;">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subscriptionsTableBody">
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #94a3b8;">
+                                <i class="fas fa-spinner fa-spin"></i> Obunalar yuklanmoqda...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Edit Subscription Modal -->
+        <div id="editSubModal" style="display:none; position:fixed; z-index:99999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:15px;" onclick="closeEditSubModal()">
+            <div style="background:#1e293b; border:1px solid rgba(255,255,255,0.15); border-radius:22px; padding:25px; max-width:460px; width:100%; color:#fff; box-shadow:0 20px 40px rgba(0,0,0,0.6); position:relative;" onclick="event.stopPropagation()">
+                <button onclick="closeEditSubModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer;">&times;</button>
+                
+                <h3 style="margin:0 0 6px; font-size:1.15rem; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-edit" style="color:#38bdf8;"></i> Obuna Muddatini Tahrirlash
+                </h3>
+                <p id="editSubTargetName" style="font-size:0.85rem; color:#94a3b8; margin:0 0 16px;">--</p>
+
+                <div style="margin-bottom:14px;">
+                    <label style="display:block; font-size:0.82rem; color:#cbd5e1; margin-bottom:5px;">Ruxsat turi:</label>
+                    <select id="editSubAccessType" style="background:#0f172a; border:1px solid var(--glass-border); color:white; padding:10px; border-radius:10px; width:100%;">
+                        <option value="access">✅ Standart Davomat Ruxsati</option>
+                        <option value="pro">👑 PRO Rejim (Barcha imkoniyatlar)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:0.82rem; color:#cbd5e1; margin-bottom:5px;">Yangi tugash sanasi:</label>
+                    <input type="date" id="editSubExpireDate" style="background:#0f172a; border:1px solid var(--glass-border); color:white; padding:10px; border-radius:10px; width:100%;">
+                </div>
+
+                <!-- Quick actions buttons -->
+                <div style="background:rgba(255,255,255,0.04); border-radius:12px; padding:12px; margin-bottom:18px;">
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px; font-weight:600;">⚡ Tezkor amallar:</div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" onclick="setQuickDate(30)" class="btn" style="flex:1; padding:7px 10px; font-size:0.75rem; background:#0284c7; color:white; justify-content:center;">
+                            <i class="fas fa-check"></i> Bugundan 30 kun
+                        </button>
+                        <button type="button" onclick="setQuickDate(60)" class="btn" style="flex:1; padding:7px 10px; font-size:0.75rem; background:rgba(255,255,255,0.1); color:#cbd5e1; justify-content:center;">
+                            60 kun (2 oy)
+                        </button>
+                        <button type="button" onclick="setQuickDate(0)" class="btn btn-danger" style="padding:7px 10px; font-size:0.75rem; justify-content:center;">
+                            <i class="fas fa-ban"></i> Bekor qilish
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button onclick="saveSubEdit()" class="btn btn-primary" style="flex:1; background:linear-gradient(135deg, #10b981, #059669); border:none; justify-content:center;">
+                        <i class="fas fa-save"></i> Saqlash
+                    </button>
+                    <button onclick="closeEditSubModal()" class="btn" style="background:rgba(255,255,255,0.1); color:#cbd5e1; justify-content:center;">
+                        Yopish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- To'lov Cheklari (Kvitansiyalar) Boshqaruvi -->
+        <div class="card" id="receiptsCard" style="margin-top: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="margin: 0; color: #f8fafc; font-size: 1.25rem;">
+                    <i class="fas fa-receipt" style="color: #38bdf8;"></i> To'lov Cheklari (Kvitansiyalar va Tasdiqlash)
+                </h3>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <select id="receiptFilter" onchange="filterReceipts()" style="width: auto; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; background: rgba(15,23,42,0.8);">
+                        <option value="pending" selected>⏳ Kutilayotganlar</option>
+                        <option value="approved">✅ Tasdiqlanganlar</option>
+                        <option value="fake_rejected">🚫 Rad etilganlar</option>
+                        <option value="all">📁 Barchasi</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadReceipts()" style="padding: 8px 15px; font-size: 0.85rem;">
+                        <i class="fas fa-sync-alt"></i> Yangilash
+                    </button>
+                    <button class="btn" onclick="downloadSubscribersExcel()" style="padding: 8px 15px; font-size: 0.85rem; background: linear-gradient(135deg, #10b981, #059669); color: white; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-file-excel"></i> To'lovlar & Obunalar (Excel)
+                    </button>
+                </div>
+            </div>
+
+            <div style="background: rgba(56, 189, 248, 0.08); border-left: 4px solid #38bdf8; padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem; color: #cbd5e1; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-info-circle" style="color: #38bdf8; font-size: 1.3rem;"></i>
+                <div>
+                    Foydalanuvchilar bot orqali yuborgan to'lov cheklarini bevosita shu yerdan ko'rib, <b>Davomat Ruxsati (1 oy)</b> yoki <b>PRO Rejim (1 oy)</b> berishingiz, yoki soxta bo'lsa rad etishingiz mumkin. Foydalanuvchiga Telegram orqali avtomatik tasdiq xabari yuboriladi.
+                </div>
+            </div>
+
+            <div id="receiptsLoading" style="text-align: center; padding: 30px; color: #94a3b8;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Cheklar yuklanmoqda...
+            </div>
+
+            <div id="receiptsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+                <!-- Dinamik to'ldiriladi -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Chek rasmini to'liq ko'rish modali -->
+    <div id="receiptModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;" onclick="closeReceiptModal()">
+        <div style="position:relative; max-width:92%; max-height:92%; display:flex; flex-direction:column; align-items:center;" onclick="event.stopPropagation()">
+            <button onclick="closeReceiptModal()" style="align-self:flex-end; margin-bottom:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; font-size:1.2rem; border-radius:8px; padding:4px 12px; cursor:pointer;">
+                <i class="fas fa-times"></i> Yopish
+            </button>
+            <img id="receiptModalImg" src="" style="max-width:100%; max-height:80vh; border-radius:12px; box-shadow:0 15px 35px rgba(0,0,0,0.9); border:1px solid rgba(255,255,255,0.2);" alt="Chek to'liq rasmi" />
+        </div>
+    </div>
+
+    <!-- Modals placeholder or toast -->
+    <div id="toast" class="toast">Xabar yuborildi!</div>
+
+    <script>
+        const token = localStorage.getItem('dashboard_token');
+        if (!token || localStorage.getItem('dashboard_role') !== 'superadmin') {
+            window.location.href = 'login.html';
+        }
+
+        function adminLogout() {
+            if (confirm("Haqiqatan ham admin paneldan chiqmoqchimisiz?")) {
+                localStorage.removeItem('dashboard_token');
+                localStorage.removeItem('dashboard_role');
+                localStorage.removeItem('dashboard_username');
+                localStorage.removeItem('dashboard_district');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function fetchSettings() {
+            try {
+                const res = await fetch('/api/admin/settings', {
+                    headers: { 'Authorization': token }
+                });
+                const settings = await res.json();
+                updateUI(settings);
+                addLog("[API] Sozlamalar yangilandi.");
+            } catch (e) {
+                addLog("[ERROR] Sozlamalarni yuklashda xatolik!", true);
+            }
+        }
+
+        function updateUI(s) {
+            const vBtn = document.getElementById('toggleVacation');
+            vBtn.textContent = s.vacation_mode ? 'Yoqilgan' : 'O\'chirilgan';
+            vBtn.className = 'btn ' + (s.vacation_mode ? 'btn-success' : 'btn-danger');
+
+            const lBtn = document.getElementById('toggleLocation');
+            lBtn.textContent = s.location_collection_mode ? 'Yoqilgan' : 'O\'chirilgan';
+            lBtn.className = 'btn ' + (s.location_collection_mode ? 'btn-success' : 'btn-danger');
+
+            const gBtn = document.getElementById('toggleGeoCheck');
+            gBtn.textContent = s.check_location ? 'Yoqilgan' : 'O\'chirilgan';
+            gBtn.className = 'btn ' + (s.check_location ? 'btn-success' : 'btn-danger');
+
+            const mBtn = document.getElementById('toggleMaintenance');
+            if (mBtn) {
+                mBtn.textContent = s.maintenance_mode ? 'Yoqilgan' : 'O\'chirilgan';
+                mBtn.className = 'btn ' + (s.maintenance_mode ? 'btn-success' : 'btn-danger');
+            }
+        }
+
+        async function updateSetting(key, val) {
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: { 'Authorization': token },
+                body: JSON.stringify({ [key]: val })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                updateUI(data.settings);
+                showToast("Sozlamalar saqlandi");
+                addLog(`[ACTION] ${key} holati ${val ? 'YOQILDI' : 'OCHIRILDI'}`);
+            }
+        }
+
+        document.getElementById('toggleVacation').onclick = function () {
+            const state = this.textContent === 'O\'chirilgan';
+            updateSetting('vacation_mode', state);
+        };
+        document.getElementById('toggleLocation').onclick = function () {
+            const state = this.textContent === 'O\'chirilgan';
+            updateSetting('location_collection_mode', state);
+        };
+        document.getElementById('toggleGeoCheck').onclick = function () {
+            const state = this.textContent === 'O\'chirilgan';
+            updateSetting('check_location', state);
+        };
+        document.getElementById('toggleMaintenance').onclick = function () {
+            const state = this.textContent === 'O\'chirilgan';
+            if (state && !confirm("DIQQAT! Texnik ishlar rejimini yoqsangiz, superadminlardan boshqa barcha uchun dashboard yopiladi. Tasdiqlaysizmi?")) return;
+            updateSetting('maintenance_mode', state);
+        };
+
+        // Broadcast logic
+        document.getElementById('broadcastForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalHtml = btn.innerHTML;
+
+            if (!confirm("Haqiqatdan ham ushbu xabarni barcha tanlangan foydalanuvchilarga yubormoqchimisiz?")) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yuborilmoqda...';
+
+            try {
+                const res = await fetch('/api/admin/broadcast', {
+                    method: 'POST',
+                    headers: { 'Authorization': token },
+                    body: (() => {
+                        const fd = new FormData();
+                        fd.append('message', document.getElementById('broadcastText').value);
+                        fd.append('group', document.getElementById('broadcastTarget').value);
+                        const file = document.getElementById('broadcastFile');
+                        if(file && file.files[0]) fd.append('file', file.files[0]);
+                        return fd;
+                    })()
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(`Yuborish boshlandi (${data.estimated_users} foydalanuvchi)`);
+                    addLog(`[BROADCAST] ${data.estimated_users} ta foydalanuvchiga xabar yuborilmoqda...`);
+                    document.getElementById('broadcastText').value = '';
+                } else {
+                    let errMsg = "Noma'lum xatolik yuz berdi";
+                    try { const errObj = await res.json(); errMsg = errObj.error || errMsg; } catch(e) {}
+                    showToast(`Xatolik: ${errMsg}`, true);
+                    addLog(`[ERROR] Xabar yuborishda xato: ${errMsg}`, true);
+                }
+            } catch (e) {
+                addLog("[ERROR] Tarmoq bilan bog'liq xatolik!", true);
+            }
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        };
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeftColor = isError ? '#ef4444' : '#6366f1';
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+                async function fetchStats() {
+            try {
+                // 1. Parents count
+                try {
+                    const parentsRes = await fetch('/api/stats/parents', { headers: { 'Authorization': token } });
+                    if (parentsRes.ok) {
+                        const parents = await parentsRes.json();
+                        if (Array.isArray(parents)) {
+                            const el = document.getElementById('totalParents');
+                            if (el) el.textContent = parents.length + ' ta';
+                        }
+                    }
+                } catch (pe) {
+                    console.warn("Parents stat error:", pe);
+                }
+
+                // 2. Viloyat entries count
+                try {
+                    const vilRes = await fetch('/api/stats/viloyat', { headers: { 'Authorization': token } });
+                    if (vilRes.ok) {
+                        const vil = await vilRes.json();
+                        if (Array.isArray(vil)) {
+                            const entries = vil.reduce((acc, curr) => acc + (curr.entries || 0), 0);
+                            const el = document.getElementById('todayEntries');
+                            if (el) el.textContent = entries + ' ta';
+                        }
+                    }
+                } catch (ve) {
+                    console.warn("Viloyat stat error:", ve);
+                }
+
+                // 3. TG Users and PRO count
+                try {
+                    const tgRes = await fetch('/api/admin/tg-users', { headers: { 'Authorization': token } });
+                    if (tgRes.ok) {
+                        const tgUsers = await tgRes.json();
+                        if (Array.isArray(tgUsers)) {
+                            const elUsers = document.getElementById('totalUsers');
+                            if (elUsers) elUsers.textContent = tgUsers.length + ' ta';
+                            const proCount = tgUsers.filter(u => u && u.data && u.data.is_pro).length;
+                            const elPro = document.getElementById('totalPro');
+                            if (elPro) elPro.textContent = proCount + ' ta';
+                        }
+                    }
+                } catch (tge) {
+                    console.warn("TG users stat error:", tge);
+                }
+
+                addLog("[INFO] Statistika yuklandi.");
+            } catch (e) {
+                console.error("fetchStats error:", e);
+                addLog("[ERROR] Statistikani yuklashda xatolik: " + (e.message || "noma'lum"), true);
+            }
+        }
+
+        function addLog(msg, isError = false) {
+            const container = document.getElementById('logContainer');
+            const div = document.createElement('div');
+            const now = new Date().toLocaleTimeString();
+            if (isError) div.style.color = '#ef4444';
+            div.textContent = `[${now}] ${msg}`;
+            container.prepend(div);
+        }
+
+        function refreshLogs() {
+            addLog("[ACTION] Loglar yangilandi.");
+            fetchStats();
+            fetchSettings();
+        }
+
+        function showPrompt(type) {
+            if (type === 'reset') alert("Ushbu funksiya bot orqali ishlaydi (Admin Panel -> Dashboard Logins)");
+            else if (type === 'pro') alert("Pro userlar ro'yxati yaqin oralarda qo'shiladi.");
+        }
+
+        fetchSettings();
+        fetchStats();
+        loadReceipts();
+        loadSubscriptions();
+
+        // --- Maktablar va Foydalanuvchilar Obunalarini Boshqarish ---
+        let allSubscriptions = [];
+        let currentEditingSub = null;
+
+        const ALL_FARGONA_DISTRICTS = [
+            "Farg'ona shahar", "Qo'qon shahar", "Marg'ilon shahar", "Quvasoy shahar",
+            "Bog'dod tumani", "Beshariq tumani", "Buvayda tumani", "Dang'ara tumani",
+            "Farg'ona tumani", "Furqat tumani", "O'zbekiston tumani", "Oltiariq tumani",
+            "Qo'shtepa tumani", "Quva tumani", "Rishton tumani", "So'x tumani",
+            "Toshloq tumani", "Uchko'prik tumani", "Yozyovon tumani"
+        ];
+
+        async function loadSubscriptions() {
+            const tbody = document.getElementById('subscriptionsTableBody');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="padding: 30px; text-align: center; color: #94a3b8;">
+                            <i class="fas fa-spinner fa-spin"></i> Obunalar yuklanmoqda...
+                        </td>
+                    </tr>
+                `;
+            }
+
+            try {
+                const res = await fetch('/api/admin/subscriptions', {
+                    headers: token ? { 'Authorization': token } : {}
+                });
+                if (res.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const data = await res.json();
+                if (res.ok && data.subscriptions) {
+                    allSubscriptions = data.subscriptions;
+                    populateDistrictDropdown();
+                    renderSubscriptions();
+                    addLog(`[SUBSCRIPTIONS] Jami ${allSubscriptions.length} ta obuna yuklandi.`);
+                } else {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#ef4444;">Yuklashda xatolik: ${(data && data.error) || 'Noma\'lum xatolik'}</td></tr>`;
+                }
+            } catch (e) {
+                console.error("loadSubscriptions error:", e);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#ef4444;">Tarmoq xatosi: ${e.message}</td></tr>`;
+            }
+        }
+
+        function populateDistrictDropdown() {
+            const sel = document.getElementById('subDistrictFilter');
+            if (!sel) return;
+            const currentVal = sel.value;
+
+            const districtsSet = new Set(ALL_FARGONA_DISTRICTS);
+            allSubscriptions.forEach(s => {
+                if (s.district) districtsSet.add(s.district);
+            });
+
+            const sortedDistricts = Array.from(districtsSet).sort((a, b) => a.localeCompare(b, 'uz'));
+
+            let html = '<option value="">-- Barcha Hududlar --</option>';
+            sortedDistricts.forEach(d => {
+                html += `<option value="${d}" ${d === currentVal ? 'selected' : ''}>${d}</option>`;
+            });
+            sel.innerHTML = html;
+        }
+
+        function renderSubscriptions() {
+            const distFilter = (document.getElementById('subDistrictFilter')?.value || '').trim().toLowerCase();
+            const statusFilter = document.getElementById('subStatusFilter')?.value || 'active';
+            const searchKeyword = (document.getElementById('subSearchInput')?.value || '').trim().toLowerCase();
+            const tbody = document.getElementById('subscriptionsTableBody');
+
+            let filtered = allSubscriptions.filter(item => {
+                if (distFilter) {
+                    const itemDist = (item.district || '').toLowerCase();
+                    if (!itemDist.includes(distFilter) && !distFilter.includes(itemDist)) {
+                        return false;
+                    }
+                }
+
+                if (statusFilter === 'active' && !item.is_active) return false;
+                if (statusFilter === 'excessive' && !item.is_excessive) return false;
+                if (statusFilter === 'expired' && item.is_active) return false;
+
+                if (searchKeyword) {
+                    const userNames = (item.users || []).map(u => `${u.fio} ${u.phone}`).join(' ').toLowerCase();
+                    const targetStr = `${item.district} ${item.school} ${userNames} ${item.user_fio || ''} ${item.phone || ''}`.toLowerCase();
+                    if (!targetStr.includes(searchKeyword)) return false;
+                }
+
+                return true;
+            });
+
+            filtered.sort((a, b) => {
+                if (a.is_excessive && !b.is_excessive) return -1;
+                if (!a.is_excessive && b.is_excessive) return 1;
+                return b.days_left - a.days_left;
+            });
+
+            const activeCount = allSubscriptions.filter(s => s.is_active).length;
+            const excessiveCount = allSubscriptions.filter(s => s.is_excessive).length;
+            if (document.getElementById('statActiveCount')) document.getElementById('statActiveCount').innerText = activeCount;
+            if (document.getElementById('statExcessiveCount')) document.getElementById('statExcessiveCount').innerText = excessiveCount;
+            if (document.getElementById('statTotalShowing')) document.getElementById('statTotalShowing').innerText = filtered.length;
+
+            if (!tbody) return;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="padding: 30px; text-align: center; color: #94a3b8;">
+                            <i class="fas fa-search"></i> Tanlangan filtrlarga mos obunalar topilmadi.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const usersHtml = (item.users && item.users.length > 0)
+                    ? item.users.map(u => `<div style="font-size:0.82rem; margin-bottom:2px;"><i class="fas fa-user" style="color:#94a3b8; font-size:0.75rem;"></i> <b>${u.fio}</b> <span style="color:#38bdf8;">(${u.phone || 'Tel yo\'q'})</span></div>`).join('')
+                    : `<span style="color:#64748b; font-style:italic;">Bog'langan foydalanuvchi yo'q</span>`;
+
+                const typeBadge = item.access_type === 'pro'
+                    ? `<span style="background:linear-gradient(135deg, rgba(234,179,8,0.2), rgba(245,158,11,0.2)); color:#facc15; border:1px solid rgba(234,179,8,0.4); padding:3px 9px; border-radius:12px; font-weight:700; font-size:0.78rem;"><i class="fas fa-crown"></i> PRO (25k)</span>`
+                    : `<span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:3px 9px; border-radius:12px; font-weight:600; font-size:0.78rem;"><i class="fas fa-calendar-check"></i> Davomat (10k)</span>`;
+
+                let daysBadge = '';
+                if (item.days_left > 35) {
+                    daysBadge = `<span style="background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(239,68,68,0.4); padding:4px 10px; border-radius:10px; font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:5px;">
+                        <i class="fas fa-exclamation-triangle"></i> ⚠️ ${item.days_left} kun (Ortiqcha!)
+                    </span>`;
+                } else if (item.days_left > 0) {
+                    daysBadge = `<span style="background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:10px; font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:5px;">
+                        <i class="fas fa-clock"></i> ${item.days_left} kun qoldi
+                    </span>`;
+                } else {
+                    daysBadge = `<span style="background:rgba(100,116,139,0.2); color:#94a3b8; border:1px solid rgba(100,116,139,0.3); padding:4px 10px; border-radius:10px; font-weight:600; font-size:0.8rem;">
+                        <i class="fas fa-times-circle"></i> Tugagan
+                    </span>`;
+                }
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--glass-border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 12px 14px;">
+                            <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">${item.school || 'Noma\'lum'}</div>
+                            <div style="font-size: 0.8rem; color: #94a3b8;"><i class="fas fa-map-marker-alt" style="color:#38bdf8;"></i> ${item.district || '--'}</div>
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            ${usersHtml}
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            ${typeBadge}
+                        </td>
+                        <td style="padding: 12px 14px; font-family: monospace; font-size: 0.9rem; color: #e2e8f0;">
+                            ${item.expire_date || '--'}
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            ${daysBadge}
+                        </td>
+                        <td style="padding: 12px 14px; text-align: center; white-space: nowrap;">
+                            <button onclick="openEditSubModal('${item.id}')" class="btn" style="padding: 6px 12px; font-size: 0.78rem; background: #0284c7; color: white;" title="Muddatni tahrirlash">
+                                <i class="fas fa-edit"></i> Tahrirlash
+                            </button>
+                            ${item.days_left > 35 ? `
+                                <button onclick="quickResetSub('${item.id}', 30)" class="btn" style="padding: 6px 12px; font-size: 0.78rem; background: #f59e0b; color: white; margin-left: 5px;" title="1 oyga (30 kunga) to'g'rilash">
+                                    <i class="fas fa-magic"></i> 30 kunga tushirish
+                                </button>
+                            ` : ''}
+                            <button onclick="quickRevokeSub('${item.id}')" class="btn btn-danger" style="padding: 6px 10px; font-size: 0.78rem; margin-left: 5px;" title="Obunani bekor qilish">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openEditSubModal(id) {
+            const item = allSubscriptions.find(s => s.id === id);
+            if (!item) return;
+
+            currentEditingSub = item;
+            document.getElementById('editSubTargetName').innerText = `${item.district || ''} - ${item.school || 'Foydalanuvchi'} (${item.users?.map(u => u.fio).join(', ') || ''})`;
+            document.getElementById('editSubAccessType').value = item.access_type || 'access';
+            document.getElementById('editSubExpireDate').value = item.expire_date || '';
+
+            const modal = document.getElementById('editSubModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeEditSubModal() {
+            const modal = document.getElementById('editSubModal');
+            if (modal) modal.style.display = 'none';
+            currentEditingSub = null;
+        }
+
+        function setQuickDate(days) {
+            const d = new Date();
+            if (days === 0) {
+                d.setDate(d.getDate() - 1);
+            } else {
+                d.setDate(d.getDate() + days);
+            }
+            const dateInput = document.getElementById('editSubExpireDate');
+            if (dateInput) {
+                dateInput.value = d.toISOString().split('T')[0];
+            }
+        }
+
+        async function saveSubEdit() {
+            if (!currentEditingSub) return;
+            const newDate = document.getElementById('editSubExpireDate').value;
+            const accessType = document.getElementById('editSubAccessType').value;
+
+            if (!newDate) {
+                alert("Iltimos, tugash sanasini tanlang!");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/subscriptions/update', {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_type: currentEditingSub.target_type,
+                        id: currentEditingSub.id,
+                        district: currentEditingSub.district,
+                        school: currentEditingSub.school,
+                        uid: currentEditingSub.uid,
+                        new_expire_date: newDate,
+                        access_type: accessType,
+                        action: 'set_date'
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(data.message || "Muvaffaqiyatli saqlandi!");
+                    closeEditSubModal();
+                    addLog(`[SUBSCRIPTION UPDATED] ${currentEditingSub.district} ${currentEditingSub.school} -> ${newDate}`);
+                    await loadSubscriptions();
+                } else {
+                    alert(data.error || "Xatolik yuz berdi!");
+                }
+            } catch (e) {
+                alert("Server bilan bog'lanishda xatolik: " + e.message);
+            }
+        }
+
+        async function quickResetSub(id, days = 30) {
+            const item = allSubscriptions.find(s => s.id === id);
+            if (!item) return;
+
+            if (!confirm(`${item.school} (${item.district}) limitini bugundan boshlab 30 kunga to'g'rilashni tasdiqlaysizmi? (Ortiqcha 100-120 kunlik xatolik to'g'rilanadi)`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/subscriptions/update', {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_type: item.target_type,
+                        id: item.id,
+                        district: item.district,
+                        school: item.school,
+                        uid: item.uid,
+                        access_type: item.access_type,
+                        action: 'reset_30_days'
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast("Limit 30 kunga muvaffaqiyatli to'g'rilandi!");
+                    addLog(`[RESET 30 DAYS] ${item.school} (${item.district}) -> ${data.expire_date}`);
+                    await loadSubscriptions();
+                } else {
+                    alert(data.error || "Xatolik!");
+                }
+            } catch (e) {
+                alert("Xatolik: " + e.message);
+            }
+        }
+
+        async function quickRevokeSub(id) {
+            const item = allSubscriptions.find(s => s.id === id);
+            if (!item) return;
+
+            if (!confirm(`${item.school} (${item.district}) obunasini bekor qilishni (ruxsatini tugatishni) tasdiqlaysizmi?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/subscriptions/update', {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_type: item.target_type,
+                        id: item.id,
+                        district: item.district,
+                        school: item.school,
+                        uid: item.uid,
+                        action: 'revoke'
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast("Obuna bekor qilindi!");
+                    addLog(`[REVOKE SUB] ${item.school} (${item.district}) ruxsati bekor qilindi.`);
+                    await loadSubscriptions();
+                } else {
+                    alert(data.error || "Xatolik!");
+                }
+            } catch (e) {
+                alert("Xatolik: " + e.message);
+            }
+        }
+
+        // --- To'lov Cheklari (Kvitansiyalar) Boshqaruvi ---
+        let allReceipts = [];
+
+        async function loadReceipts() {
+            const loading = document.getElementById('receiptsLoading');
+            const container = document.getElementById('receiptsContainer');
+            if (loading) loading.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/admin/receipts', {
+                    headers: { 'Authorization': token }
+                });
+                if (res.status === 401) {
+                    if (loading) loading.innerHTML = `<span style="color:#f59e0b;"><i class="fas fa-lock"></i> Sessiya muddati tugagan. Iltimos, <a href="login.html" style="color:#38bdf8; text-decoration: underline; font-weight:bold;">qaytadan tizimga kiring</a>.</span>`;
+                    return;
+                }
+                if (!res.ok) throw new Error("Cheklarni yuklab bo'lmadi (" + res.status + ")");
+                allReceipts = await res.json();
+                if (loading) loading.style.display = 'none';
+                filterReceipts();
+            } catch (e) {
+                if (loading) loading.innerHTML = `<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> Xatolik: ${e.message}</span>`;
+            }
+        }
+
+        function filterReceipts() {
+            const filterEl = document.getElementById('receiptFilter');
+            const filter = filterEl ? filterEl.value : 'pending';
+            const container = document.getElementById('receiptsContainer');
+            if (!container) return;
+
+            let filtered = allReceipts;
+            if (filter !== 'all') {
+                filtered = allReceipts.filter(r => (r.status || 'pending') === filter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-folder-open fa-2x"></i><br><br>Ushbu toifada to'lov cheklari mavjud emas</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(r => {
+                const isPending = !r.status || r.status === 'pending';
+                const isApproved = r.status === 'approved';
+                const isRejected = r.status === 'fake_rejected';
+
+                let badge = `<span class="status-badge" style="background:rgba(234,179,8,0.2); color:#facc15; border:1px solid #eab308;"><i class="fas fa-clock"></i> Kutilmoqda</span>`;
+                if (isApproved) badge = `<span class="status-badge status-on"><i class="fas fa-check"></i> Tasdiqlangan</span>`;
+                if (isRejected) badge = `<span class="status-badge status-off"><i class="fas fa-times"></i> Rad etilgan</span>`;
+
+                const imgUrl = r.file_url || (r.file_id ? `/api/admin/receipts/${r.id}/image` : '/assets/main_logo.jpg');
+                const dateStr = r.submitted_at ? new Date(r.submitted_at).toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' }) : '-';
+
+                return `
+                    <div style="background: rgba(15,23,42,0.6); border: 1px solid ${isPending ? 'rgba(99,102,241,0.35)' : 'rgba(255,255,255,0.08)'}; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.8rem; color:#94a3b8;"><i class="far fa-calendar-alt"></i> ${dateStr}</span>
+                            ${badge}
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <div style="width:90px; height:110px; flex-shrink:0; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); cursor:pointer; background:#000;" onclick="openReceiptModal('${imgUrl}')" title="Kattalashtirib ko'rish">
+                                <img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/assets/main_logo.jpg'" alt="Chek rasmi" />
+                            </div>
+                            <div style="flex:1; font-size:0.85rem; display:flex; flex-direction:column; gap:4px; overflow:hidden;">
+                                <div style="font-weight:600; color:#fff; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    ${r.sender_name || 'Noma\'lum'}
+                                </div>
+                                <div style="color:#cbd5e1;"><i class="fas fa-school" style="width:16px; color:#38bdf8;"></i> ${r.school || '-'}</div>
+                                <div style="color:#94a3b8;"><i class="fas fa-map-marker-alt" style="width:16px;"></i> ${r.district || '-'}</div>
+                                <div style="color:#94a3b8;"><i class="fas fa-phone" style="width:16px;"></i> <a href="tel:${r.phone}" style="color:#38bdf8; text-decoration:none;">${r.phone || '-'}</a></div>
+                                <div style="color:#64748b; font-size:0.75rem;">ID: <code>${r.sender_uid || '-'}</code></div>
+                            </div>
+                        </div>
+
+                        ${isPending ? `
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:5px;">
+                            <button class="btn btn-success" style="padding:8px 10px; font-size:0.8rem; justify-content:center;" onclick="handleReceiptAction('${r.id}', 'approve_access')">
+                                <i class="fas fa-check"></i> 1 oy Davomat
+                            </button>
+                            <button class="btn btn-primary" style="padding:8px 10px; font-size:0.8rem; justify-content:center; background:#8b5cf6;" onclick="handleReceiptAction('${r.id}', 'approve_pro')">
+                                <i class="fas fa-star"></i> 1 oy PRO
+                            </button>
+                            <button class="btn btn-danger" style="grid-column:1 / -1; padding:7px 10px; font-size:0.8rem; justify-content:center;" onclick="handleReceiptAction('${r.id}', 'reject_fake')">
+                                <i class="fas fa-ban"></i> Soxta Chek (Rad etish)
+                            </button>
+                        </div>
+                        ` : `
+                        <div style="font-size:0.78rem; color:#64748b; margin-top:auto; padding-top:6px; border-top:1px dashed rgba(255,255,255,0.08);">
+                            <span>Ko'rib chiqdi: <b>${r.resolved_by || 'Admin'}</b></span>
+                        </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openReceiptModal(url) {
+            const modal = document.getElementById('receiptModal');
+            const img = document.getElementById('receiptModalImg');
+            if (modal && img) {
+                img.src = url;
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeReceiptModal() {
+            const modal = document.getElementById('receiptModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handleReceiptAction(receiptId, action) {
+            let confirmMsg = "Ushbu amalni tasdiqlaysizmi?";
+            if (action === 'approve_access') confirmMsg = "Foydalanuvchiga 1 oy Davomat Ruxsati berilsinmi?";
+            if (action === 'approve_pro') confirmMsg = "Foydalanuvchiga 1 oy PRO obuna berilsinmi?";
+            if (action === 'reject_fake') confirmMsg = "Ushbu chekni soxta deb rad etmoqchimisiz? Foydalanuvchiga rad etilgani haqida xabar boradi.";
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await fetch(`/api/admin/receipts/${receiptId}/action`, {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, months: 1 })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast("Chek muvaffaqiyatli qayta ishlandi!");
+                    addLog(`[ACTION] Chek ${receiptId} holati o'zgartirildi: ${action}`);
+                    await loadReceipts();
+                    await loadSubscriptions();
+                } else {
+                    alert(data.error || "Xatolik yuz berdi!");
+                }
+            } catch (e) {
+                alert("Server bilan bog'lanishda xatolik: " + e.message);
+            }
+        }
+
+        function handleCustomAction(action) {
+            if (action === 'backup') {
+                showToast("Baza Zaxirasi yaratilmoqda...");
+                fetch('/api/admin/backup', { headers: { 'Authorization': token } }).then(() => {
+                    showToast("Zaxira muvaffaqiyatli saqlandi!");
+                    addLog("[ACTION] Database backup created.");
+                }).catch(() => showToast("Zaxira yaratishda xatolik!", true));
+            } else if (action === 'cache') {
+                if(confirm("Tizim keshini haqiqatan ham tozalamoqchimisiz?")) {
+                    showToast("Kesh tozalash boshlandi...");
+                    setTimeout(() => { showToast("Kesh muvaffaqiyatli tozalandi!"); addLog("[ACTION] Tizim keshi tozalandi."); }, 1000);
+                }
+            } else if (action === 'redzone') {
+                alert("Qizil hudud tahlili tez kunda qo'shiladi! (Tizim faol)");
+            } else if (action === 'restart') {
+                if(confirm("Serverni qayta ishga tushirish (Restart) barcha amallarni vaqtincha to'xtatadi. Tasdiqlaysizmi?")) {
+                    showToast("Server qayta ishlanmoqda...", true);
+                    addLog("[SYSTEM] RESTART INITIALIZED", true);
+                }
+            }
+        }
+
+        // Auto refresh stats every 30 seconds
+        setInterval(fetchStats, 30000);
+    
+        async function uploadDocument(e) {
+            e.preventDefault();
+            const form = new FormData();
+            form.append('title', document.getElementById('docTitle').value);
+            if(document.getElementById('docFile').files[0]) {
+                form.append('document_file', document.getElementById('docFile').files[0]);
+            }
+            showToast("Hujjat serverga yuklanmoqda...");
+            try {
+                const res = await fetch('/api/documents', {
+                    method: 'POST',
+                    headers: { 'Authorization': token },
+                    body: form
+                });
+                if(res.ok) {
+                    showToast("Hujjat muvaffaqiyatli e'lon qilindi!");
+                    document.getElementById('docsForm').reset();
+                    addLog("[ACTION] Yangi me'yoriy hujjat saytga yuklandi!");
+                } else alert("Xatolik!");
+            } catch(er) { showToast("Xatolik jiddiy yuz berdi!", true); }
+        }
+
+        let manualMode = 'school';
+        function switchManualMode(mode) {
+            manualMode = mode;
+            const schoolBlock = document.getElementById('manualSchoolBlock');
+            const phoneBlock = document.getElementById('manualPhoneBlock');
+            const schoolBtn = document.getElementById('tabBySchoolBtn');
+            const phoneBtn = document.getElementById('tabByPhoneBtn');
+
+            if (mode === 'school') {
+                schoolBlock.style.display = 'block';
+                phoneBlock.style.display = 'none';
+                schoolBtn.className = 'btn btn-primary';
+                phoneBtn.className = 'btn';
+                phoneBtn.style.background = 'rgba(255,255,255,0.08)';
+                phoneBtn.style.color = '#cbd5e1';
+            } else {
+                schoolBlock.style.display = 'none';
+                phoneBlock.style.display = 'block';
+                phoneBtn.className = 'btn btn-primary';
+                schoolBtn.className = 'btn';
+                schoolBtn.style.background = 'rgba(255,255,255,0.08)';
+                schoolBtn.style.color = '#cbd5e1';
+            }
+        }
+
+        async function loadManualDistricts() {
+            try {
+                const res = await fetch('/api/districts');
+                const districts = await res.json();
+                const sel = document.getElementById('manualDistrict');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- Tumanni tanlang --</option>' + 
+                    districts.map(d => `<option value="${d}">${d}</option>`).join('');
+            } catch(e) {
+                console.error("loadManualDistricts error:", e);
+            }
+        }
+
+        async function loadManualSchools() {
+            const district = document.getElementById('manualDistrict').value;
+            const sel = document.getElementById('manualSchool');
+            if (!district) {
+                sel.innerHTML = '<option value="">-- Avval tumanni tanlang --</option>';
+                return;
+            }
+            sel.innerHTML = '<option value="">Maktablar yuklanmoqda...</option>';
+            try {
+                const res = await fetch(`/api/schools?district=${encodeURIComponent(district)}`);
+                const schools = await res.json();
+                sel.innerHTML = '<option value="">-- Maktabni tanlang --</option>' + 
+                    schools.map(s => `<option value="${s}">${s}</option>`).join('');
+            } catch(e) {
+                sel.innerHTML = '<option value="">Maktablarni yuklab bo\'lmadi</option>';
+            }
+        }
+
+        async function submitManualAccess() {
+            const type = document.getElementById('manualAccessType').value;
+            const months = document.getElementById('manualMonths').value;
+
+            if (manualMode === 'phone') {
+                const phone = document.getElementById('proPhone').value;
+                if (!phone) return alert("Iltimos, telefon raqamni kiriting!");
+                if (!confirm(`${phone} raqamiga ${months} oylik limit berishni tasdiqlaysizmi?`)) return;
+                
+                try {
+                    const res = await fetch('/api/admin/set-pro', {
+                        method: 'POST',
+                        headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone, months, type })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showToast(data.message || "Limit muvaffaqiyatli berildi!");
+                        addLog(`[ACTION] Manual limit given to phone: ${phone}`);
+                    } else alert(data.error || "Xatolik!");
+                } catch(e) { alert("Server bilan bog'lanishda xatolik!"); }
+                return;
+            }
+
+            // School mode
+            const district = document.getElementById('manualDistrict').value;
+            const school = document.getElementById('manualSchool').value;
+            if (!district || !school) return alert("Iltimos, tuman va maktabni tanlang!");
+
+            if (!confirm(`${district}, ${school} uchun ${months} oylik ${type === 'pro' ? 'PRO' : 'Standart'} limit berishni tasdiqlaysizmi?`)) return;
+
+            try {
+                const res = await fetch('/api/admin/grant-school-access', {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ district, school, months, type })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(data.message || "Maktab limiti faollashtirildi!");
+                    addLog(`[ACTION] Manual limit granted: ${district} - ${school}`);
+                } else {
+                    alert(data.error || "Xatolik yuz berdi!");
+                }
+            } catch(e) {
+                alert("Server xatosi: " + e.message);
+            }
+        }
+
+        async function activatePro() {
+            return submitManualAccess();
+        }
+
+        loadManualDistricts();
+
+    
+        async function downloadBackup() {
+            if(!confirm("Barcha baza ma'lumotlarini (Xorij, Davomat, Userlar) JSON formatda yuklab olishni tasdiqlaysizmi?")) return;
+            
+            try {
+                const res = await fetch('/api/admin/export-db', {
+                    headers: { 'Authorization': token }
+                });
+                if(res.status === 403) return alert("Ruxsat yo'q! Faqat Asosiy Admin uchun.");
+                if(!res.ok) throw new Error("Yuklab olishda xatolik!");
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `davomat_db_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                addLog("[ACTION] Database backup downloaded");
+            } catch(e) { alert("Xatolik: " + e.message); }
+        }
+
+        // Role based UI restrictions
+        function applyRoleRestrictions() {
+            const role = localStorage.getItem('user_role');
+            if (role === 'admin') {
+                const proCards = document.querySelectorAll('#proManagerCard, #dbBackupCard');
+                proCards.forEach(c => c.style.display = 'none');
+                
+                const proLinks = document.querySelectorAll('a[href="#proManagerCard"], a[href="#dbBackupCard"]');
+                proLinks.forEach(l => l.style.visibility = 'hidden');
+                
+                addLog("[SYSTEM] Admin account access restricted.");
+            }
+        }
+        async function downloadSubscribersExcel() {
+            const token = localStorage.getItem('token') || localStorage.getItem('dashboard_token');
+            try {
+                const res = await fetch('/api/admin/export-subscribers', {
+                    headers: token ? { 'Authorization': token } : {}
+                });
+                if (res.status === 401) {
+                    alert("Sessiya muddati tugagan. Iltimos, login.html orqali qaytadan kiring!");
+                    window.location.href = 'login.html';
+                    return;
+                }
+                if (!res.ok) throw new Error("Hisobotni yuklab bo'lmadi (" + res.status + ")");
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `OBUNACHILAR_TOLOVLAR_${new Date().toISOString().split('T')[0]}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                addLog("[EXPORT] Obunachilar va to'lovlar hisoboti yuklab olindi.");
+            } catch(e) {
+                alert("Xatolik: " + e.message);
+            }
+        }
+
+        applyRoleRestrictions();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('PWA ServiceWorker registered');
+      }).catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>    <!-- Between Us Promo Widget -->
+    <script src="promo-widget.js"></script>
+</body>
+
+</html>

@@ -963,6 +963,11 @@ const requestCount = new Map();
 const SECURITY_ALERT_THRESHOLD = 1000; // Increased to 1000 API requests per minute
 
 const securityShield = (req, res, next) => {
+    // Exclude Telegram bot webhook requests from SQL pattern false positives
+    if (req.path === '/bot' || req.originalUrl === '/api/bot' || (req.url && req.url.startsWith('/api/bot'))) {
+        return next();
+    }
+
     // 1. Basic Security Headers (Manual Helmet)
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');

@@ -28,7 +28,8 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
+            width: 95%;
             margin: 0 auto;
         }
 
@@ -54,7 +55,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
         }
 
@@ -162,26 +163,41 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
+            padding: 14px 16px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 18px;
             margin-bottom: 12px;
             transition: all 0.3s ease;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .toggle-container:hover {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(255, 255, 255, 0.2);
         }
 
+        .toggle-left {
+            flex: 1 1 180px;
+            min-width: 150px;
+        }
+
+        .toggle-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
         /* Modern iOS-Style Toggle Switch */
         .switch {
             position: relative;
             display: inline-block;
-            width: 54px;
+            width: 52px;
             height: 28px;
             flex-shrink: 0;
-            margin-left: 10px;
+            margin: 0;
         }
         .switch input {
             opacity: 0;
@@ -195,16 +211,16 @@
             background-color: #334155;
             transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
             background-color: white;
             transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 50%;
@@ -216,7 +232,7 @@
             box-shadow: 0 0 14px rgba(34, 197, 94, 0.45);
         }
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(24px);
         }
         .toggle-status-text {
             font-size: 0.78rem;
@@ -225,6 +241,9 @@
             border-radius: 12px;
             transition: 0.3s;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .toggle-status-on {
             color: #4ade80;
@@ -383,11 +402,11 @@
 
                 <!-- 1. Ta'til rejimi -->
                 <div class="toggle-container">
-                    <div>
+                    <div class="toggle-left">
                         <div style="font-weight: 600; color: #f8fafc;">Ta'til rejimi (Holiday)</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Bot xabarlarini to'xtatadi</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top:2px;">Bot xabarlarini to'xtatadi</div>
                     </div>
-                    <div style="display: flex; align-items: center;">
+                    <div class="toggle-right">
                         <span id="badgeVacation" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
                         <label class="switch">
                             <input type="checkbox" id="toggleVacation" onchange="handleToggleChange('vacation_mode', this.checked, 'badgeVacation')">
@@ -398,13 +417,13 @@
 
                 <!-- 2. 1 Kunga to'lovsiz davomat (NEW!) -->
                 <div class="toggle-container" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.25);">
-                    <div>
+                    <div class="toggle-left">
                         <div style="font-weight: 700; color: #38bdf8; display:flex; align-items:center; gap:6px;">
                             <i class="fas fa-unlock-alt"></i> 1 kunga to'lovsiz davomat (Free Day)
                         </div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Bir kunga avtomatik to'lov tekshiruvini o'chirish (barcha maktablarga bepul kiritish)</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top:2px;">Bir kunga avtomatik to'lov tekshiruvini o'chirish (barcha maktablarga bepul kiritish)</div>
                     </div>
-                    <div style="display: flex; align-items: center;">
+                    <div class="toggle-right">
                         <span id="badgeBypassPayment" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
                         <label class="switch">
                             <input type="checkbox" id="toggleBypassPayment" onchange="handleToggleChange('bypass_payment_check', this.checked, 'badgeBypassPayment')">
@@ -415,11 +434,11 @@
 
                 <!-- 3. Manzil yig'ish -->
                 <div class="toggle-container">
-                    <div>
+                    <div class="toggle-left">
                         <div style="font-weight: 600; color: #f8fafc;">Manzil yig'ish</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Barcha school koordinatalari</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top:2px;">Barcha school koordinatalari</div>
                     </div>
-                    <div style="display: flex; align-items: center;">
+                    <div class="toggle-right">
                         <span id="badgeLocation" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
                         <label class="switch">
                             <input type="checkbox" id="toggleLocation" onchange="handleToggleChange('location_collection_mode', this.checked, 'badgeLocation')">
@@ -430,11 +449,11 @@
 
                 <!-- 4. Geolokatsiya tekshiruvi -->
                 <div class="toggle-container">
-                    <div>
+                    <div class="toggle-left">
                         <div style="font-weight: 600; color: #f8fafc;">Geolokatsiya tekshiruvi</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Kiritishda joylashuvni talab qilish</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top:2px;">Kiritishda joylashuvni talab qilish</div>
                     </div>
-                    <div style="display: flex; align-items: center;">
+                    <div class="toggle-right">
                         <span id="badgeGeoCheck" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
                         <label class="switch">
                             <input type="checkbox" id="toggleGeoCheck" onchange="handleToggleChange('check_location', this.checked, 'badgeGeoCheck')">
@@ -445,11 +464,11 @@
 
                 <!-- 5. Texnik ishlar (Maintenance) -->
                 <div class="toggle-container">
-                    <div>
+                    <div class="toggle-left">
                         <div style="font-weight: 600; color: #f8fafc;">⚠️ Texnik ishlar (Maintenance)</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Dashboardni vaqtincha yopish</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top:2px;">Dashboardni vaqtincha yopish</div>
                     </div>
-                    <div style="display: flex; align-items: center;">
+                    <div class="toggle-right">
                         <span id="badgeMaintenance" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
                         <label class="switch">
                             <input type="checkbox" id="toggleMaintenance" onchange="handleToggleChange('maintenance_mode', this.checked, 'badgeMaintenance')">

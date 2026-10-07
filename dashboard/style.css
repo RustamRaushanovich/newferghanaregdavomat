@@ -1646,9 +1646,13 @@ body.light-mode {
     .dashboard-container {
         padding: 10px !important;
     }
-    .stats-grid, .grid {
+    .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
         gap: 10px !important;
+    }
+    .grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
     }
     .stat-card, .card {
         padding: 14px !important;

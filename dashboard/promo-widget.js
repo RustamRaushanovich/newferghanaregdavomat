@@ -8,20 +8,21 @@
     style.textContent = `
         .bu-promo-container {
             position: fixed;
-            bottom: 24px;
+            bottom: 85px;
             right: 24px;
-            z-index: 999999;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            z-index: 9999;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
         }
         .bu-promo-container.bu-slide-collapsed {
-            transform: translateX(calc(100% + 40px));
+            transform: translateX(calc(100% + 60px));
+            opacity: 0;
             pointer-events: none;
         }
         .bu-promo-card {
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 18px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(99, 102, 241, 0.25);
@@ -122,8 +123,8 @@
         .bu-slide-tab {
             position: fixed;
             right: 0;
-            bottom: 30px;
-            z-index: 999998;
+            bottom: 100px;
+            z-index: 9998;
             background: linear-gradient(135deg, #1e1b4b, #312e81);
             border: 1px solid rgba(129, 140, 248, 0.4);
             border-right: none;
@@ -154,19 +155,19 @@
             box-shadow: -6px 8px 25px rgba(99, 102, 241, 0.5);
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .bu-promo-container {
-                bottom: 14px;
-                right: 14px;
+                bottom: 80px;
+                right: 12px;
             }
             .bu-promo-card {
-                width: 250px;
+                width: 260px;
                 padding: 12px 14px;
             }
             .bu-slide-tab {
-                bottom: 20px;
+                bottom: 90px;
                 font-size: 11px;
-                padding: 6px 10px 6px 8px;
+                padding: 7px 12px 7px 9px;
             }
         }
     `;
@@ -245,3 +246,4 @@
         }
     } catch(e){}
 })();
+

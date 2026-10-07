@@ -107,6 +107,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard', 'index.html'));
 });
 
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'online', time: new Date().toISOString() });
+});
+
 
 // Load Parent Bot
 try {

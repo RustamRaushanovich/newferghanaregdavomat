@@ -14,6 +14,10 @@
   ],
   "routes": [
     {
+      "src": "/admin.html",
+      "dest": "/index.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.js"
     }

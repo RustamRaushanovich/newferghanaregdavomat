@@ -740,6 +740,24 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Table Pagination Controls -->
+            <div id="subPaginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 12px; background: rgba(15,23,42,0.6); padding: 12px 16px; border-radius: 14px; border: 1px solid var(--glass-border);">
+                <div style="font-size: 0.85rem; color: #94a3b8; display: flex; align-items: center; gap: 10px;">
+                    <span>Har bir sahifada:</span>
+                    <select id="subPerPageSelect" onchange="changeSubPerPage(this.value)" style="background: rgba(15,23,42,0.9); border: 1px solid var(--glass-border); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; width: auto; cursor: pointer;">
+                        <option value="20" selected>20 ta</option>
+                        <option value="50">50 ta</option>
+                        <option value="100">100 ta</option>
+                        <option value="all">Barchasi</option>
+                    </select>
+                </div>
+                <div style="font-size: 0.85rem; color: #cbd5e1; font-weight: 600;" id="subPaginationInfo">
+                    Sahifa 1 / 1
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;" id="subPaginationNav">
+                </div>
+            </div>
         </div>
 
         <!-- Edit Subscription Modal -->
@@ -1077,6 +1095,22 @@
         let allSubscriptions = [];
         let currentEditingSub = null;
 
+        let subCurrentPage = 1;
+        let subItemsPerPage = 20;
+
+        function changeSubPerPage(val) {
+            subItemsPerPage = val === 'all' ? 'all' : parseInt(val);
+            subCurrentPage = 1;
+            renderSubscriptions();
+        }
+
+        function goToSubPage(page) {
+            subCurrentPage = page;
+            renderSubscriptions();
+            const el = document.getElementById('subscriptionsManagerCard');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         const ALL_FARGONA_DISTRICTS = [
             "Farg'ona shahar", "Qo'qon shahar", "Marg'ilon shahar", "Quvasoy shahar",
             "Bog'dod tumani", "Beshariq tumani", "Buvayda tumani", "Dang'ara tumani",
@@ -1178,6 +1212,68 @@
             if (document.getElementById('statExcessiveCount')) document.getElementById('statExcessiveCount').innerText = excessiveCount;
             if (document.getElementById('statTotalShowing')) document.getElementById('statTotalShowing').innerText = filtered.length;
 
+            const totalCount = filtered.length;
+            const perPage = subItemsPerPage === 'all' ? totalCount : (parseInt(subItemsPerPage) || 20);
+            const totalPages = (perPage > 0 && totalCount > 0) ? Math.ceil(totalCount / perPage) : 1;
+
+            if (subCurrentPage > totalPages) subCurrentPage = totalPages;
+            if (subCurrentPage < 1) subCurrentPage = 1;
+
+            const startIndex = (perPage > 0 && subItemsPerPage !== 'all') ? (subCurrentPage - 1) * perPage : 0;
+            const paginatedItems = (subItemsPerPage === 'all' || perPage >= totalCount)
+                ? filtered
+                : filtered.slice(startIndex, startIndex + perPage);
+
+            // Update Pagination Info
+            const infoEl = document.getElementById('subPaginationInfo');
+            if (infoEl) {
+                if (totalCount === 0) {
+                    infoEl.innerText = "0 ta yozuv";
+                } else if (subItemsPerPage === 'all') {
+                    infoEl.innerText = `Jami ${totalCount} ta yozuv ko'rsatilyapti`;
+                } else {
+                    const endIdx = Math.min(startIndex + perPage, totalCount);
+                    infoEl.innerText = `${startIndex + 1}-${endIdx} / Jami ${totalCount} ta (Sahifa ${subCurrentPage}/${totalPages})`;
+                }
+            }
+
+            // Update Pagination Nav Buttons
+            const navEl = document.getElementById('subPaginationNav');
+            if (navEl) {
+                if (totalPages <= 1 || subItemsPerPage === 'all') {
+                    navEl.innerHTML = '';
+                } else {
+                    let navHtml = '';
+                    navHtml += `<button onclick="goToSubPage(${subCurrentPage - 1})" class="btn" ${subCurrentPage === 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} style="padding:5px 11px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;"><i class="fas fa-chevron-left"></i> Avvalgi</button>`;
+
+                    const maxVisible = 5;
+                    let startPage = Math.max(1, subCurrentPage - 2);
+                    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+                    if (endPage - startPage < maxVisible - 1) {
+                        startPage = Math.max(1, endPage - maxVisible + 1);
+                    }
+
+                    if (startPage > 1) {
+                        navHtml += `<button onclick="goToSubPage(1)" class="btn" style="padding:5px 10px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;">1</button>`;
+                        if (startPage > 2) navHtml += `<span style="color:#64748b; padding:0 2px;">...</span>`;
+                    }
+
+                    for (let i = startPage; i <= endPage; i++) {
+                        const isActive = i === subCurrentPage;
+                        navHtml += `<button onclick="goToSubPage(${i})" class="btn" style="padding:5px 10px; font-size:0.78rem; background:${isActive ? '#0284c7' : 'rgba(255,255,255,0.08)'}; color:white; font-weight:${isActive ? '700' : '400'};">${i}</button>`;
+                    }
+
+                    if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) navHtml += `<span style="color:#64748b; padding:0 2px;">...</span>`;
+                        navHtml += `<button onclick="goToSubPage(${totalPages})" class="btn" style="padding:5px 10px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;">${totalPages}</button>`;
+                    }
+
+                    navHtml += `<button onclick="goToSubPage(${subCurrentPage + 1})" class="btn" ${subCurrentPage === totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} style="padding:5px 11px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;">Keyingi <i class="fas fa-chevron-right"></i></button>`;
+
+                    navEl.innerHTML = navHtml;
+                }
+            }
+
             if (!tbody) return;
 
             if (filtered.length === 0) {
@@ -1191,7 +1287,7 @@
                 return;
             }
 
-            tbody.innerHTML = filtered.map(item => {
+            tbody.innerHTML = paginatedItems.map(item => {
                 const usersHtml = (item.users && item.users.length > 0)
                     ? item.users.map(u => `<div style="font-size:0.82rem; margin-bottom:2px;"><i class="fas fa-user" style="color:#94a3b8; font-size:0.75rem;"></i> <b>${u.fio}</b> <span style="color:#38bdf8;">(${u.phone || 'Tel yo\'q'})</span></div>`).join('')
                     : `<span style="color:#64748b; font-style:italic;">Bog'langan foydalanuvchi yo'q</span>`;

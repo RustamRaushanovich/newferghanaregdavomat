@@ -119,11 +119,11 @@
             fill: currentColor;
         }
 
-        /* Slidebar Edge Opener Tab */
+        /* Slidebar Edge Opener Tab (Tucked into right edge) */
         .bu-slide-tab {
             position: fixed;
             right: 0;
-            bottom: 100px;
+            bottom: 120px;
             z-index: 9998;
             background: linear-gradient(135deg, #1e1b4b, #312e81);
             border: 1px solid rgba(129, 140, 248, 0.4);
@@ -138,21 +138,22 @@
             gap: 8px;
             font-size: 12px;
             font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateX(100%);
-            opacity: 0;
-            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            transform: translateX(calc(100% - 34px));
+            opacity: 0.9;
+            pointer-events: auto;
         }
         .bu-slide-tab.bu-tab-visible {
-            transform: translateX(0);
-            opacity: 1;
+            transform: translateX(calc(100% - 34px));
+            opacity: 0.9;
             pointer-events: auto;
         }
         .bu-slide-tab:hover {
-            padding-left: 14px;
+            transform: translateX(0) !important;
+            opacity: 1 !important;
             background: linear-gradient(135deg, #312e81, #4338ca);
             color: #fff;
-            box-shadow: -6px 8px 25px rgba(99, 102, 241, 0.5);
+            box-shadow: -6px 8px 25px rgba(99, 102, 241, 0.6);
         }
 
         @media (max-width: 768px) {
@@ -165,7 +166,7 @@
                 padding: 12px 14px;
             }
             .bu-slide-tab {
-                bottom: 90px;
+                bottom: 110px;
                 font-size: 11px;
                 padding: 7px 12px 7px 9px;
             }

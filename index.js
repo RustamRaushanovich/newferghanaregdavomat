@@ -3628,7 +3628,7 @@ bot.action(/^approve_pro:(.+):(.+)$/, async (ctx) => {
 });
 
 // 3. Soxta Chek (Rad etish)
-bot.action(/^reject_fake:(\d+):(.+)$/, async (ctx) => {
+bot.action(/^reject_fake:(.+?)(?::(.+))?$/, async (ctx) => {
     if (!isBotAdmin(ctx.from.id)) {
         return ctx.answerCbQuery("⛔ Ruxsat yo'q. Faqat adminlar rad etishi mumkin.", { show_alert: true });
     }
@@ -3637,7 +3637,9 @@ bot.action(/^reject_fake:(\d+):(.+)$/, async (ctx) => {
     const receiptId = ctx.match[2];
 
     try {
-        await paymentService.updateReceiptStatus(receiptId, 'fake_rejected', ctx.from.id);
+        if (receiptId) {
+            await paymentService.updateReceiptStatus(receiptId, 'fake_rejected', ctx.from.id);
+        }
         await ctx.answerCbQuery("🚫 Soxta chek rad etildi!", { show_alert: true });
 
         const oldCaption = (ctx.update.callback_query.message && ctx.update.callback_query.message.caption) || '';
@@ -3651,21 +3653,24 @@ bot.action(/^reject_fake:(\d+):(.+)$/, async (ctx) => {
         }
 
         try {
-            await ctx.telegram.sendMessage(
-                targetUid,
-                `❌ <b>To'lovingiz rad etildi!</b>\n\nSiz yuborgan to'lov cheki ma'muriyat tomonidan tekshirilib, soxta yoki noto'g'ri deb topildi.\n\nIltimos, faqat o'zingiz amalga oshirgan haqiqiy to'lov kvitansiyasini yuboring.`,
-                { parse_mode: 'HTML' }
-            );
+            if (targetUid && !String(targetUid).startsWith('web_')) {
+                await bot.telegram.sendMessage(
+                    targetUid,
+                    `❌ <b>To'lovingiz rad etildi!</b>\n\nSiz yuborgan to'lov cheki ma'muriyat tomonidan tekshirilib, soxta yoki noto'g'ri deb topildi.\n\nIltimos, faqat o'zingiz amalga oshirgan haqiqiy to'lov kvitansiyasini yuboring.`,
+                    { parse_mode: 'HTML' }
+                );
+            }
         } catch (e) {
             console.warn("User notify error:", e.message);
         }
     } catch (e) {
+        console.error("Reject fake error:", e);
         ctx.answerCbQuery("Xatolik: " + e.message, { show_alert: true });
     }
 });
 
 // 4. Legacy reject_pro
-bot.action(/^reject_pro:(\d+)(?::(.+))?$/, async (ctx) => {
+bot.action(/^reject_pro:(.+?)(?::(.+))?$/, async (ctx) => {
     if (!isBotAdmin(ctx.from.id)) {
         return ctx.answerCbQuery("⛔ Ruxsat yo'q.", { show_alert: true });
     }
@@ -3683,11 +3688,13 @@ bot.action(/^reject_pro:(\d+)(?::(.+))?$/, async (ctx) => {
     } catch (e) {}
 
     try {
-        await ctx.telegram.sendMessage(
-            targetUid,
-            "❌ Uzr, to'lov chekingiz tasdiqlanmadi. Xatolik bo'lsa adminga murojaat qiling.",
-            { parse_mode: 'HTML' }
-        );
+        if (targetUid && !String(targetUid).startsWith('web_')) {
+            await bot.telegram.sendMessage(
+                targetUid,
+                "❌ Uzr, to'lov chekingiz tasdiqlanmadi. Xatolik bo'lsa adminga murojaat qiling.",
+                { parse_mode: 'HTML' }
+            );
+        }
     } catch (e) {}
 });
 

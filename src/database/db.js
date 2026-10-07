@@ -7,12 +7,14 @@ const USERS_DB_FILE = path.join(__dirname, 'users_db.json');
 const PROMO_FILE = path.join(__dirname, 'promocodes.json');
 const SCHOOLS_FILE = path.join(__dirname, 'schools.json');
 const COORDS_FILE = path.join(__dirname, 'coords.json');
+const DESKTOP_DEVICES_FILE = path.join(__dirname, 'desktop_devices.json');
 
 let settings = { vacation_mode: false, location_collection_mode: false, check_location: false, maintenance_mode: false, bypass_payment_check: false, academic_year: '2026-2027' };
 let users_db = {};
 let promocodes = {};
 let schools_db = {};
 let coords_db = {};
+let desktop_devices = {};
 
 async function loadAll() {
     try { if (fs.existsSync(SETTINGS_FILE)) settings = { ...settings, ...JSON.parse(fs.readFileSync(SETTINGS_FILE)) }; } catch (e) { }
@@ -20,6 +22,8 @@ async function loadAll() {
     try { if (fs.existsSync(PROMO_FILE)) promocodes = JSON.parse(fs.readFileSync(PROMO_FILE)); } catch (e) { }
     try { if (fs.existsSync(SCHOOLS_FILE)) schools_db = JSON.parse(fs.readFileSync(SCHOOLS_FILE)); } catch (e) { }
     try { if (fs.existsSync(COORDS_FILE)) coords_db = JSON.parse(fs.readFileSync(COORDS_FILE)); } catch (e) { }
+    try { if (fs.existsSync(DESKTOP_DEVICES_FILE)) desktop_devices = JSON.parse(fs.readFileSync(DESKTOP_DEVICES_FILE)); } catch (e) { }
+
 
     // Backup from PostgreSQL
     try {
@@ -485,12 +489,18 @@ function checkAttendanceAccessByPhone(phone) {
 // Initial load
 loadAll();
 
+function saveDesktopDevices() {
+    try { fs.writeFileSync(DESKTOP_DEVICES_FILE, JSON.stringify(desktop_devices, null, 2)); } catch (e) { }
+}
+
 module.exports = {
     get settings() { return settings; },
     get users_db() { return users_db; },
     get promocodes() { return promocodes; },
     get schools_db() { return schools_db; },
     get coords_db() { return coords_db; },
+    get desktop_devices() { return desktop_devices; },
+    saveDesktopDevices,
     saveSettings,
     savePromos,
     saveUser,
@@ -509,3 +519,4 @@ module.exports = {
     loadAll, // Export for manual sync
     saveSchools: () => { try { fs.writeFileSync(SCHOOLS_FILE, JSON.stringify(schools_db)); } catch (e) { } }
 };
+

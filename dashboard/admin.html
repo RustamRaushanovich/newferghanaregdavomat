@@ -867,6 +867,50 @@
             </div>
         </div>
 
+        <!-- Desktop Dastur Foydalanuvchilari (Live Online/Offline Monitoring) -->
+        <div class="card" id="desktopDevicesCard" style="margin-top: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="margin: 0; color: #f8fafc; font-size: 1.25rem;">
+                    <i class="fas fa-desktop" style="color: #facc15;"></i> Desktop Dastur Foydalanuvchilari (Live Monitoring)
+                </h3>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="loadDesktopDevices()" style="padding: 8px 15px; font-size: 0.85rem;">
+                        <i class="fas fa-sync-alt"></i> Yangilash
+                    </button>
+                </div>
+            </div>
+
+            <div style="background: rgba(250, 204, 21, 0.08); border-left: 4px solid #facc15; padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem; color: #cbd5e1; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-info-circle" style="color: #facc15; font-size: 1.3rem;"></i>
+                <div>
+                    Kompyuteriga <b>Ferghana Davomat Desktop (RTR v01.00)</b> dasturini o'rnatib ro'yxatdan o'tgan mas'ullar, ularning IP manzillari, versiyalari hamda <b>ONLINE / OFFLINE</b> holatlari.
+                </div>
+            </div>
+
+            <div style="overflow-x: auto; border-radius: 14px; border: 1px solid var(--glass-border);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.06); border-bottom: 1px solid var(--glass-border); color: #cbd5e1;">
+                            <th style="padding: 12px 14px;">Mas'ul F.I.SH va Tel</th>
+                            <th style="padding: 12px 14px;">Hudud va Maktab</th>
+                            <th style="padding: 12px 14px;">IP Manzili</th>
+                            <th style="padding: 12px 14px;">Dastur Versiyasi</th>
+                            <th style="padding: 12px 14px;">Holati</th>
+                            <th style="padding: 12px 14px;">Oxirgi Faollik</th>
+                        </tr>
+                    </thead>
+                    <tbody id="desktopDevicesTableBody">
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #94a3b8;">
+                                <i class="fas fa-spinner fa-spin"></i> Qurilmalar yuklanmoqda...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
     </div>
 
     <!-- Chek rasmini to'liq ko'rish modali -->
@@ -1747,8 +1791,63 @@
             }
         }
 
+        // Live Desktop Devices Monitoring
+        async function loadDesktopDevices() {
+            const tbody = document.getElementById('desktopDevicesTableBody');
+            if (!tbody) return;
+            try {
+                const res = await fetch('/api/admin/desktop/devices', {
+                    headers: { 'Authorization': token }
+                });
+                if (!res.ok) throw new Error("Qurilmalarni yuklashda xatolik");
+                const list = await res.json();
+                if (list.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="padding:30px; text-align:center; color:#94a3b8;"><i class="fas fa-laptop-house fa-2x"></i><br><br>Hali ro'yxatdan o'tgan desktop foydalanuvchilari mavjud emas</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = list.map(d => {
+                    const statusBadge = d.is_online
+                        ? `<span class="status-badge status-on" style="font-size:0.75rem;"><i class="fas fa-signal"></i> 🟢 ONLINE</span>`
+                        : `<span class="status-badge status-off" style="font-size:0.75rem;"><i class="fas fa-wifi-slash"></i> 🔴 OFFLINE</span>`;
+                    const dateStr = d.last_ping ? new Date(d.last_ping).toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' }) : '-';
+
+                    return `
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td style="padding: 12px 14px;">
+                                <div style="font-weight:700; color:#fff;">${d.name || 'Noma\'lum'}</div>
+                                <div style="font-size:0.8rem; color:#38bdf8;">${d.phone || '-'}</div>
+                            </td>
+                            <td style="padding: 12px 14px;">
+                                <div style="font-weight:600; color:#f8fafc;">${d.school || '-'}</div>
+                                <div style="font-size:0.8rem; color:#94a3b8;">${d.district || '-'}</div>
+                            </td>
+                            <td style="padding: 12px 14px; font-family:monospace; color:#facc15;">
+                                ${d.ip_address || '127.0.0.1'}
+                            </td>
+                            <td style="padding: 12px 14px;">
+                                <span style="background:rgba(250,204,21,0.15); color:#facc15; border:1px solid rgba(250,204,21,0.3); font-size:0.75rem; padding:3px 8px; border-radius:10px; font-weight:700;">
+                                    ${d.app_version || 'RTR v01.00'}
+                                </span>
+                            </td>
+                            <td style="padding: 12px 14px;">
+                                ${statusBadge}
+                            </td>
+                            <td style="padding: 12px 14px; font-size:0.8rem; color:#94a3b8;">
+                                ${dateStr}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#ef4444;">Xatolik: ${e.message}</td></tr>`;
+            }
+        }
+        setTimeout(loadDesktopDevices, 1000);
+        setInterval(loadDesktopDevices, 15000);
+
         // Auto refresh stats every 30 seconds
         setInterval(fetchStats, 30000);
+
     
         async function uploadDocument(e) {
             e.preventDefault();

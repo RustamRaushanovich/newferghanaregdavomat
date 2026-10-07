@@ -9,6 +9,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Animated Futuristic Splash Intro Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo-container">
+                <img src="../assets/main_logo.jpg" class="splash-logo" alt="Logo" onerror="this.src='../assets/logo.png'">
+                <div class="splash-glow"></div>
+            </div>
+            <h1 class="splash-title">FERGHANA DAVOMAT</h1>
+            <p class="splash-subtitle">DESKTOP PLATFORMASI • RTR v01.00</p>
+            <div class="splash-loader">
+                <div class="splash-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Internet Status Notification Banner -->
     <div id="netStatusBanner" class="net-status-banner net-online" style="display:none;">
         <span id="netStatusText"><i class="fas fa-wifi"></i> Internet tarmog'iga ulandi</span>
@@ -26,15 +41,96 @@
         </div>
     </div>
 
+    <!-- Update Notification Modal -->
+    <div id="updateModal" class="update-modal" style="display:none;">
+        <div class="update-card">
+            <div class="update-header">
+                <i class="fas fa-rocket" style="color: #facc15; font-size: 1.8rem;"></i>
+                <h3>Yangi Yangilanish Mavjud!</h3>
+            </div>
+            <p id="updateVersionText" style="font-weight: 700; color: #38bdf8; font-size: 1.05rem; margin: 12px 0 6px;">Versiya: RTR v01.01</p>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px;">O'zgarishlar va yangiliklar:</div>
+            <div id="updateChangelog" class="update-changelog">
+                --
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 18px;">
+                <button id="btnDownloadUpdate" class="action-btn-primary" style="flex:1;">
+                    <i class="fas fa-download"></i> Yangilanishni Yuklab Olish
+                </button>
+                <button id="btnCloseUpdateModal" class="action-btn-secondary">
+                    Keyinroq
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Registration Modal -->
+    <div id="registerModal" class="update-modal" style="display:none;">
+        <div class="update-card" style="border-color: rgba(56, 189, 248, 0.4);">
+            <div class="update-header">
+                <i class="fas fa-id-card" style="color: #38bdf8; font-size: 1.8rem;"></i>
+                <h3>Dasturni Ro'yxatdan O'tkazish</h3>
+            </div>
+            <p style="font-size:0.85rem; color:#94a3b8; margin:8px 0 15px;">Dasturdan foydalanayotgan mas'ul xodim va maktab ma'lumotlarini kiriting (Ma'lumotlar Web Admin Panelda ko'rinib turadi):</p>
+            
+            <form id="registerForm">
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.8rem; color:#cbd5e1; margin-bottom:4px;">Mas'ul F.I.SH (Ismingiz):</label>
+                    <input type="text" id="regName" required placeholder="Masalan: Sardor Alimov" style="width:100%; padding:10px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.85rem;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.8rem; color:#cbd5e1; margin-bottom:4px;">Tuman / Shahar:</label>
+                    <input type="text" id="regDistrict" required placeholder="Masalan: Farg'ona shahri" style="width:100%; padding:10px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.85rem;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.8rem; color:#cbd5e1; margin-bottom:4px;">Maktab nomi / Nomeri:</label>
+                    <input type="text" id="regSchool" required placeholder="Masalan: 15-maktab" style="width:100%; padding:10px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.85rem;">
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; font-size:0.8rem; color:#cbd5e1; margin-bottom:4px;">Telefon raqamingiz:</label>
+                    <input type="tel" id="regPhone" required placeholder="998901234567" style="width:100%; padding:10px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.85rem;">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="action-btn-primary" style="flex:1;">
+                        <i class="fas fa-check-circle"></i> Saqlash va Ro'yxatdan O'tish
+                    </button>
+                    <button type="button" id="btnCloseRegModal" class="action-btn-secondary">
+                        Yopish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Emergency Broadcast Alert Modal -->
+    <div id="emergencyAlertModal" class="update-modal" style="display:none; background:rgba(15,23,42,0.92);">
+        <div class="update-card" style="border-color: #ef4444; box-shadow: 0 0 40px rgba(239,68,68,0.4);">
+            <div class="update-header">
+                <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 2rem;"></i>
+                <h3 style="color: #f87171;">Favqulodda Bildirishnoma (Web/Bot)</h3>
+            </div>
+            <div id="emergencyAlertText" class="update-changelog" style="border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); color: #fff; font-size: 0.95rem; margin-top: 15px;">
+                --
+            </div>
+            <button id="btnCloseEmergencyBtn" class="action-btn-primary" style="width: 100%; margin-top: 18px; background: linear-gradient(135deg, #ef4444, #dc2626);">
+                <i class="fas fa-check"></i> Tushundim
+            </button>
+        </div>
+    </div>
+
     <!-- Top Glassmorphic Titlebar & Quick Controls -->
     <header class="titlebar">
         <div class="titlebar-left">
             <img src="../assets/main_logo.jpg" class="app-logo" alt="Logo" onerror="this.src='../assets/logo.png'">
-            <span class="app-name">DAVOMAT <span class="app-badge">DESKTOP PRO</span></span>
+            <span class="app-name">DAVOMAT <span class="app-badge">DESKTOP PRO</span> <span class="version-badge" id="appVersionBadge">RTR v01.00</span></span>
             <span id="netIndicator" class="net-indicator net-ind-online" title="Internet holati"><i class="fas fa-signal"></i> Online</span>
         </div>
 
         <div class="titlebar-center">
+            <button id="btnRegisterDevice" class="preset-btn" title="Dasturni va qurilmani ro'yxatdan o'tkazish" style="background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid rgba(250,204,21,0.3);">
+                <i class="fas fa-id-card"></i> <span id="regBtnText">Ro'yxatdan o'tish</span>
+            </button>
+
             <div class="preset-buttons">
                 <button id="btnPresetDefault" class="preset-btn active" title="75% Davomat + 25% Telegram Split">
                     <i class="fas fa-columns"></i> 75% / 25% Split

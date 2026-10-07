@@ -7,6 +7,23 @@
     "start": "electron .",
     "dist": "electron-builder --win nsis"
   },
+  "build": {
+    "appId": "com.ferghanadavomat.app",
+    "productName": "Ferghana Davomat",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Ferghana Davomat"
+    }
+  },
   "keywords": [
     "davomat",
     "telegram",
@@ -16,6 +33,8 @@
   "author": "RustamRaushanovich",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^28.2.0"
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.0",
+    "electron-packager": "^17.1.2"
   }
 }

@@ -18,7 +18,7 @@ function createWindow() {
         title: "Ferghana Davomat & Telegram Desktop",
         frame: false, // Custom sleek glassmorphic titlebar
         backgroundColor: '#0f172a',
-        icon: path.join(__dirname, '../assets/main_logo.jpg'),
+        icon: path.join(__dirname, 'app_icon.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -64,6 +64,14 @@ ipcMain.on('window-close', () => {
 });
 
 app.whenReady().then(() => {
+    // Configure Windows Autostart on startup
+    try {
+        app.setLoginItemSettings({
+            openAtLogin: true,
+            path: app.getPath('exe')
+        });
+    } catch (e) { }
+
     createWindow();
 
     app.on('activate', () => {

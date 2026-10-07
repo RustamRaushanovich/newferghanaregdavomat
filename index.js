@@ -125,6 +125,99 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'online', time: new Date().toISOString() });
 });
 
+// Download Desktop App Installer Setup File (.exe)
+app.get('/download/Ferghana_Davomat_Setup.exe', (req, res) => {
+    const exePath = path.join(__dirname, 'desktop_app', 'dist', 'Ferghana_Davomat_Setup.exe');
+    if (fs.existsSync(exePath)) {
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', 'attachment; filename="Ferghana_Davomat_Setup.exe"');
+        res.sendFile(exePath);
+    } else {
+        res.status(404).send('Dastur fayli topilmadi. Iltimos adminga murojaat qiling.');
+    }
+});
+
+
+// Desktop Version & Auto Update API Endpoint (RTR v01.00)
+app.get('/api/desktop/version', (req, res) => {
+    res.json({
+        latest_version: (db && db.settings && db.settings.latest_desktop_version) ? db.settings.latest_desktop_version : 'RTR v01.00',
+        min_required_version: 'RTR v01.00',
+        download_url: (db && db.settings && db.settings.desktop_update_url) ? db.settings.desktop_update_url : 'https://newferghanaregdavomat.vercel.app/download/Ferghana_Davomat_Setup.exe',
+        changelog: (db && db.settings && db.settings.desktop_changelog) ? db.settings.desktop_changelog : "• Tizim barqarorligi va ishlash tezligi oshirildi.\n• Yangilanishlar avtomatik tekshiruvi qo'shildi."
+    });
+});
+
+// Desktop App Device Registration Endpoint
+app.post('/api/desktop/register', (req, res) => {
+    const { device_id, name, district, school, phone, app_version } = req.body;
+    if (!device_id) return res.status(400).json({ error: 'Device ID kiritilmadi' });
+
+    const clientIp = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').replace('::ffff:', '');
+    
+    if (!db.desktop_devices) db.desktop_devices = {};
+    db.desktop_devices[device_id] = {
+        device_id,
+        name: name || 'Noma\'lum',
+        district: district || 'Noma\'lum',
+        school: school || 'Noma\'lum',
+        phone: phone || '',
+        app_version: app_version || 'RTR v01.00',
+        ip_address: clientIp,
+        last_ping: new Date().toISOString(),
+        registered_at: db.desktop_devices[device_id]?.registered_at || new Date().toISOString()
+    };
+    if (db.saveDesktopDevices) db.saveDesktopDevices();
+    res.json({ success: true, message: 'Dastur va qurilma muvaffaqiyatli ro\'yxatdan o\'tkazildi!' });
+});
+
+// Desktop App Heartbeat & Emergency Alert Ping Endpoint
+app.post('/api/desktop/ping', (req, res) => {
+    const { device_id, app_version } = req.body;
+    if (!device_id) return res.json({ registered: false });
+
+    if (!db.desktop_devices) db.desktop_devices = {};
+    const clientIp = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').replace('::ffff:', '');
+    
+    const dev = db.desktop_devices[device_id];
+    if (dev) {
+        dev.last_ping = new Date().toISOString();
+        dev.ip_address = clientIp;
+        if (app_version) dev.app_version = app_version;
+        if (db.saveDesktopDevices) db.saveDesktopDevices();
+    }
+
+    const latestAlert = db.settings.latest_desktop_alert || null;
+
+    res.json({
+        registered: !!dev,
+        device_data: dev || null,
+        status: 'online',
+        emergency_alert: latestAlert
+    });
+});
+
+// Admin: Get all registered Desktop app devices with live online/offline status
+app.get('/api/admin/desktop/devices', auth, (req, res) => {
+    if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Ruxsat yo\'q' });
+
+    const now = new Date().getTime();
+    const list = Object.values(db.desktop_devices || {}).map(dev => {
+        const lastPingTime = new Date(dev.last_ping || 0).getTime();
+        const isOnline = (now - lastPingTime) < 45000; // Active within last 45 sec
+        return {
+            ...dev,
+            is_online: isOnline,
+            status: isOnline ? 'online' : 'offline'
+        };
+    });
+
+    list.sort((a, b) => b.is_online - a.is_online);
+    res.json(list);
+});
+
+
+
 
 // Load Parent Bot
 try {

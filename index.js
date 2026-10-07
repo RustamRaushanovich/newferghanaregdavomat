@@ -110,7 +110,15 @@ app.use(express.static(path.join(__dirname, 'dashboard'), { etag: false, maxAge:
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.sendFile(path.join(__dirname, 'dashboard', 'index.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(__dirname, 'dashboard', 'admin.html'));
 });
 
 app.get('/api/health', (req, res) => {

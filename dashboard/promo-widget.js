@@ -1,6 +1,13 @@
-// Between Us Corner Promo Widget with Smooth Slidebar
+// Between Us Corner Promo Widget (Completely hides when closed)
 (function() {
     if (document.getElementById('betweenus-promo-widget')) return;
+
+    // Check if user previously closed the promo widget
+    try {
+        if (localStorage.getItem('bu_closed') === 'true') {
+            return;
+        }
+    } catch(e) {}
 
     // Inject Styles
     const style = document.createElement('style');
@@ -13,11 +20,6 @@
             z-index: 9999;
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-        }
-        .bu-promo-container.bu-slide-collapsed {
-            transform: translateX(calc(100% + 60px));
-            opacity: 0;
-            pointer-events: none;
         }
         .bu-promo-card {
             background: rgba(15, 23, 42, 0.95);
@@ -119,43 +121,6 @@
             fill: currentColor;
         }
 
-        /* Slidebar Edge Opener Tab (Tucked into right edge) */
-        .bu-slide-tab {
-            position: fixed;
-            right: 0;
-            bottom: 120px;
-            z-index: 9998;
-            background: linear-gradient(135deg, #1e1b4b, #312e81);
-            border: 1px solid rgba(129, 140, 248, 0.4);
-            border-right: none;
-            border-radius: 20px 0 0 20px;
-            padding: 8px 14px 8px 10px;
-            color: #e0e7ff;
-            cursor: pointer;
-            box-shadow: -4px 6px 20px rgba(0,0,0,0.4);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-            transform: translateX(calc(100% - 34px));
-            opacity: 0.9;
-            pointer-events: auto;
-        }
-        .bu-slide-tab.bu-tab-visible {
-            transform: translateX(calc(100% - 34px));
-            opacity: 0.9;
-            pointer-events: auto;
-        }
-        .bu-slide-tab:hover {
-            transform: translateX(0) !important;
-            opacity: 1 !important;
-            background: linear-gradient(135deg, #312e81, #4338ca);
-            color: #fff;
-            box-shadow: -6px 8px 25px rgba(99, 102, 241, 0.6);
-        }
-
         @media (max-width: 768px) {
             .bu-promo-container {
                 bottom: 80px;
@@ -164,11 +129,6 @@
             .bu-promo-card {
                 width: 260px;
                 padding: 12px 14px;
-            }
-            .bu-slide-tab {
-                bottom: 110px;
-                font-size: 11px;
-                padding: 7px 12px 7px 9px;
             }
         }
     `;
@@ -187,7 +147,7 @@
         <div class="bu-promo-card" id="bu-card">
             <div class="bu-promo-header">
                 <span class="bu-badge">Reklama / Hamkor</span>
-                <button class="bu-close-btn" id="bu-close-btn" title="Chetga yashirish (Slide)">✕</button>
+                <button class="bu-close-btn" id="bu-close-btn" title="Umuman yopish">✕</button>
             </div>
             <div class="bu-title">
                 ✨ Between Us
@@ -206,45 +166,17 @@
         </div>
     `;
 
-    // Slide tab element (Chetda qoluvchi tugma)
-    const slideTab = document.createElement('div');
-    slideTab.id = 'bu-slide-tab';
-    slideTab.className = 'bu-slide-tab';
-    slideTab.innerHTML = `<span>◀ ✨ Between Us</span>`;
-    slideTab.title = "Between Us reklamasini ochish";
-
     document.body.appendChild(container);
-    document.body.appendChild(slideTab);
 
     const closeBtn = document.getElementById('bu-close-btn');
 
-    function collapseToSlidebar() {
-        container.classList.add('bu-slide-collapsed');
-        slideTab.classList.add('bu-tab-visible');
-        try { sessionStorage.setItem('bu_collapsed', 'true'); } catch(e){}
-    }
-
-    function expandFromSlidebar() {
-        container.classList.remove('bu-slide-collapsed');
-        slideTab.classList.remove('bu-tab-visible');
-        try { sessionStorage.removeItem('bu_collapsed'); } catch(e){}
-    }
-
     closeBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        collapseToSlidebar();
+        container.style.display = 'none';
+        try {
+            localStorage.setItem('bu_closed', 'true');
+        } catch(e){}
     });
-
-    slideTab.addEventListener('click', function(e) {
-        e.stopPropagation();
-        expandFromSlidebar();
-    });
-
-    // Check if previously collapsed in this session
-    try {
-        if (sessionStorage.getItem('bu_collapsed') === 'true') {
-            collapseToSlidebar();
-        }
-    } catch(e){}
 })();
+
 

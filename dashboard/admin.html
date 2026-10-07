@@ -817,11 +817,17 @@
                     <i class="fas fa-receipt" style="color: #38bdf8;"></i> To'lov Cheklari (Kvitansiyalar va Tasdiqlash)
                 </h3>
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <select id="receiptFilter" onchange="filterReceipts()" style="width: auto; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; background: rgba(15,23,42,0.8);">
+                    <select id="receiptFilter" onchange="receiptCurrentPage=1; filterReceipts()" style="width: auto; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; background: rgba(15,23,42,0.8); color: white; border: 1px solid var(--glass-border);">
                         <option value="pending" selected>⏳ Kutilayotganlar</option>
                         <option value="approved">✅ Tasdiqlanganlar</option>
                         <option value="fake_rejected">🚫 Rad etilganlar</option>
                         <option value="all">📁 Barchasi</option>
+                    </select>
+                    <select id="receiptPerPageSelect" onchange="changeReceiptPerPage(this.value)" style="width: auto; padding: 8px 12px; font-size: 0.85rem; border-radius: 10px; background: rgba(15,23,42,0.8); color: white; border: 1px solid var(--glass-border);">
+                        <option value="20" selected>20 talik</option>
+                        <option value="50">50 talik</option>
+                        <option value="100">100 talik</option>
+                        <option value="all">Barchasi</option>
                     </select>
                     <button class="btn btn-primary" onclick="loadReceipts()" style="padding: 8px 15px; font-size: 0.85rem;">
                         <i class="fas fa-sync-alt"></i> Yangilash
@@ -845,6 +851,16 @@
 
             <div id="receiptsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
                 <!-- Dinamik to'ldiriladi -->
+            </div>
+
+            <!-- Pagination Controls for Receipts -->
+            <div id="receiptPaginationFooter" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--glass-border); flex-wrap: wrap; gap: 12px;">
+                <div id="receiptPaginationInfo" style="font-size: 0.85rem; color: #94a3b8;">
+                    0 ta chek
+                </div>
+                <div id="receiptPaginationNav" style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <!-- Nav buttons dynamically injected -->
+                </div>
             </div>
         </div>
 
@@ -1489,6 +1505,21 @@
 
         // --- To'lov Cheklari (Kvitansiyalar) Boshqaruvi ---
         let allReceipts = [];
+        let receiptCurrentPage = 1;
+        let receiptItemsPerPage = 20;
+
+        function changeReceiptPerPage(val) {
+            receiptItemsPerPage = val === 'all' ? 'all' : parseInt(val);
+            receiptCurrentPage = 1;
+            filterReceipts();
+        }
+
+        function goToReceiptPage(page) {
+            receiptCurrentPage = page;
+            filterReceipts();
+            const el = document.getElementById('receiptsCard');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         async function loadReceipts() {
             const loading = document.getElementById('receiptsLoading');
@@ -1525,10 +1556,76 @@
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-folder-open fa-2x"></i><br><br>Ushbu toifada to'lov cheklari mavjud emas</div>`;
+                const infoEl = document.getElementById('receiptPaginationInfo');
+                if (infoEl) infoEl.innerText = "0 ta chek";
+                const navEl = document.getElementById('receiptPaginationNav');
+                if (navEl) navEl.innerHTML = '';
                 return;
             }
 
-            container.innerHTML = filtered.map(r => {
+            const totalCount = filtered.length;
+            const perPage = receiptItemsPerPage === 'all' ? totalCount : (parseInt(receiptItemsPerPage) || 20);
+            const totalPages = (perPage > 0 && totalCount > 0) ? Math.ceil(totalCount / perPage) : 1;
+
+            if (receiptCurrentPage > totalPages) receiptCurrentPage = totalPages;
+            if (receiptCurrentPage < 1) receiptCurrentPage = 1;
+
+            const startIndex = (perPage > 0 && receiptItemsPerPage !== 'all') ? (receiptCurrentPage - 1) * perPage : 0;
+            const paginatedItems = (receiptItemsPerPage === 'all' || perPage >= totalCount)
+                ? filtered
+                : filtered.slice(startIndex, startIndex + perPage);
+
+            // Update Pagination Info
+            const infoEl = document.getElementById('receiptPaginationInfo');
+            if (infoEl) {
+                if (totalCount === 0) {
+                    infoEl.innerText = "0 ta chek";
+                } else if (receiptItemsPerPage === 'all') {
+                    infoEl.innerText = `Jami ${totalCount} ta chek ko'rsatilyapti`;
+                } else {
+                    const endIdx = Math.min(startIndex + perPage, totalCount);
+                    infoEl.innerText = `${startIndex + 1}-${endIdx} / Jami ${totalCount} ta chek (Sahifa ${receiptCurrentPage}/${totalPages})`;
+                }
+            }
+
+            // Update Pagination Nav Buttons
+            const navEl = document.getElementById('receiptPaginationNav');
+            if (navEl) {
+                if (totalPages <= 1 || receiptItemsPerPage === 'all') {
+                    navEl.innerHTML = '';
+                } else {
+                    let navHtml = '';
+                    navHtml += `<button onclick="goToReceiptPage(${receiptCurrentPage - 1})" class="btn" ${receiptCurrentPage === 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} style="padding:5px 11px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;"><i class="fas fa-chevron-left"></i> Avvalgi</button>`;
+
+                    const maxVisible = 5;
+                    let startPage = Math.max(1, receiptCurrentPage - 2);
+                    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+                    if (endPage - startPage < maxVisible - 1) {
+                        startPage = Math.max(1, endPage - maxVisible + 1);
+                    }
+
+                    if (startPage > 1) {
+                        navHtml += `<button onclick="goToReceiptPage(1)" class="btn" style="padding:5px 10px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;">1</button>`;
+                        if (startPage > 2) navHtml += `<span style="color:#64748b; padding:0 2px;">...</span>`;
+                    }
+
+                    for (let i = startPage; i <= endPage; i++) {
+                        const isActive = i === receiptCurrentPage;
+                        navHtml += `<button onclick="goToReceiptPage(${i})" class="btn" style="padding:5px 10px; font-size:0.78rem; background:${isActive ? '#0284c7' : 'rgba(255,255,255,0.08)'}; color:white; font-weight:${isActive ? '700' : '400'};">${i}</button>`;
+                    }
+
+                    if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) navHtml += `<span style="color:#64748b; padding:0 2px;">...</span>`;
+                        navHtml += `<button onclick="goToReceiptPage(${totalPages})" class="btn" style="padding:5px 10px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;">${totalPages}</button>`;
+                    }
+
+                    navHtml += `<button onclick="goToReceiptPage(${receiptCurrentPage + 1})" class="btn" ${receiptCurrentPage === totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} style="padding:5px 11px; font-size:0.78rem; background:rgba(255,255,255,0.08); color:white;">Keyingi <i class="fas fa-chevron-right"></i></button>`;
+
+                    navEl.innerHTML = navHtml;
+                }
+            }
+
+            container.innerHTML = paginatedItems.map(r => {
                 const isPending = !r.status || r.status === 'pending';
                 const isApproved = r.status === 'approved';
                 const isRejected = r.status === 'fake_rejected';

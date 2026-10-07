@@ -1040,6 +1040,30 @@ try {
 
 const stage = new Scenes.Stage([attendanceWizard, broadcastScene, xorijWizard]);
 bot.use(session());
+bot.use(stage.middleware());
+
+// Telegram Bot Webhook Route for Serverless Vercel & Production
+app.post('/api/bot', async (req, res) => {
+    try {
+        await bot.handleUpdate(req.body, res);
+        if (!res.headersSent) res.status(200).send('OK');
+    } catch (e) {
+        console.error('[TG WEBHOOK ERROR]', e.message);
+        if (!res.headersSent) res.status(200).send('OK');
+    }
+});
+
+app.get('/api/admin/set-webhook', async (req, res) => {
+    try {
+        const host = req.headers.host || 'ferghanaregdavomat.uz';
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const webhookUrl = `${protocol}://${host}/api/bot`;
+        await bot.telegram.setWebhook(webhookUrl, { drop_pending_updates: true });
+        res.json({ success: true, webhook_url: webhookUrl });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 
 async function handleStartCommand(ctx) {
     console.log(`[START] User: ${ctx.from ? ctx.from.id : 'N/A'}`);
@@ -3773,6 +3797,10 @@ bot.command('tabrik_hamma', async (ctx) => {
 });
 
 async function launchBotSafe(maxRetries = 10, delayMs = 6000) {
+    if (process.env.VERCEL) {
+        console.log("⚡ [Bot] Running in Vercel Serverless environment. Webhook mode active on /api/bot.");
+        return;
+    }
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             console.log(`[Bot] Ishga tushirishga urinish (${attempt}/${maxRetries})...`);

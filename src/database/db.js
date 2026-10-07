@@ -8,7 +8,7 @@ const PROMO_FILE = path.join(__dirname, 'promocodes.json');
 const SCHOOLS_FILE = path.join(__dirname, 'schools.json');
 const COORDS_FILE = path.join(__dirname, 'coords.json');
 
-let settings = { vacation_mode: false, location_collection_mode: false, check_location: false, maintenance_mode: false, academic_year: '2026-2027' };
+let settings = { vacation_mode: false, location_collection_mode: false, check_location: false, maintenance_mode: false, bypass_payment_check: false, academic_year: '2026-2027' };
 let users_db = {};
 let promocodes = {};
 let schools_db = {};
@@ -221,6 +221,7 @@ function grantSchoolAccess(district, school, months = 1, type = 'access', custom
 }
 
 function checkSchoolAccess(district, school) {
+    if (settings.bypass_payment_check) return true;
     if (!district || !school || !settings.school_access) return false;
     const { normalizeKey } = require('../utils/topics');
     const normD = normalizeKey(district);
@@ -407,6 +408,7 @@ function updateSubscriptionExpireDate(params) {
 }
 
 function checkAttendanceAccess(uid) {
+    if (settings.bypass_payment_check) return true;
     if (SUPER_ADMIN_IDS.map(Number).includes(Number(uid))) return true;
     if (SPECIALIST_IDS.map(Number).includes(Number(uid))) return true;
 
@@ -445,6 +447,7 @@ function checkProByPhone(phone) {
 }
 
 function checkAttendanceAccessByPhone(phone) {
+    if (settings.bypass_payment_check) return true;
     if (!phone) return false;
     const cleanPhone = phone.replace(/\D/g, '');
 

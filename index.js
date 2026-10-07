@@ -650,13 +650,14 @@ app.get('/api/admin/export-subscribers', auth, async (req, res) => {
     if (!isAuthorized) return res.status(403).json({ error: 'Ruxsat yo\'q' });
     try {
         const { exportSubscribersToExcel } = require('./src/services/dataService');
-        const filePath = await exportSubscribersToExcel();
-        if (filePath && fs.existsSync(filePath)) {
-            return res.download(filePath, path.basename(filePath));
+        const result = await exportSubscribersToExcel(res);
+        if (result === true || res.headersSent) return;
+        if (typeof result === 'string' && fs.existsSync(result)) {
+            return res.download(result, path.basename(result));
         }
         res.status(500).json({ error: 'Fayl yaratib bo\'lmadi' });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        if (!res.headersSent) res.status(500).json({ error: e.message });
     }
 });
 
@@ -1714,11 +1715,13 @@ app.get('/api/documents', async (req, res) => {
 
 app.post('/api/admin/settings', auth, async (req, res) => {
     if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Ruxsat yo\'q' });
-    const { vacation_mode, location_collection_mode, check_location } = req.body;
+    const { vacation_mode, location_collection_mode, check_location, maintenance_mode, bypass_payment_check } = req.body;
 
     if (vacation_mode !== undefined) db.settings.vacation_mode = vacation_mode;
     if (location_collection_mode !== undefined) db.settings.location_collection_mode = location_collection_mode;
     if (check_location !== undefined) db.settings.check_location = check_location;
+    if (maintenance_mode !== undefined) db.settings.maintenance_mode = maintenance_mode;
+    if (bypass_payment_check !== undefined) db.settings.bypass_payment_check = bypass_payment_check;
 
     await db.saveSettings();
     res.json({ success: true, settings: db.settings });
@@ -2179,6 +2182,13 @@ bot.hears("❌ Pro Bekor Qilish", (ctx) => { if (config.SUPER_ADMIN_IDS.includes
 bot.hears("➕ Promokod Yaratish", (ctx) => { if (config.SUPER_ADMIN_IDS.includes(ctx.from.id)) { ctx.reply("Tez orada..."); } });
 bot.hears("🔴 Ta'tilni YOQISH", (ctx) => { if (config.SUPER_ADMIN_IDS.includes(ctx.from.id)) { db.settings.vacation_mode = true; db.saveSettings(); ctx.reply("🔴 TA'TIL YOQILDI"); } });
 bot.hears("🟢 Ta'tilni O'CHIRISH", (ctx) => { if (config.SUPER_ADMIN_IDS.includes(ctx.from.id)) { db.settings.vacation_mode = false; db.saveSettings(); ctx.reply("🟢 TA'TIL O'CHIRILDI"); } });
+bot.hears("🔓 1-Kunga Bepul Davomat", (ctx) => {
+    if (config.SUPER_ADMIN_IDS.map(Number).includes(Number(ctx.from.id))) {
+        db.settings.bypass_payment_check = !db.settings.bypass_payment_check;
+        db.saveSettings();
+        ctx.reply(`🔓 1-Kunga Bepul Davomat Holati:\n${db.settings.bypass_payment_check ? "🟢 YOQILDI (Bugun barcha maktablar uchun davomat kiritish BEPUL!)" : "🔴 O'CHIRILDI (Standart to'lov tekshiruvi faol)"}`);
+    }
+});
 bot.hears("⬅️ Orqaga", (ctx) => {
     let buttons = [["Davomat kiritish"]];
     if (config.ALL_ADMINS.map(Number).includes(ctx.from.id)) buttons.push(["⚙️ Admin Panel"]);

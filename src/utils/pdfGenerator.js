@@ -1,6 +1,20 @@
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+
+function getUploadsDir() {
+    try {
+        const dir = path.join(__dirname, '../../assets/uploads');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        const testFile = path.join(dir, `.test_${Date.now()}`);
+        fs.writeFileSync(testFile, 'test');
+        fs.unlinkSync(testFile);
+        return dir;
+    } catch (e) {
+        return os.tmpdir();
+    }
+}
 
 function generateBildirgi(data) {
     return new Promise((resolve, reject) => {
@@ -8,11 +22,7 @@ function generateBildirgi(data) {
             const doc = new PDFDocument({ size: 'A4', margin: 50 });
             const timestamp = Date.now();
             const fileName = `BILDIRGI_${data.district}_${data.school}_${timestamp}.pdf`.replace(/[^a-zA-Z0-9_.]/g, '_');
-            const filePath = path.join(__dirname, '../../assets/uploads', fileName);
-
-            if (!fs.existsSync(path.dirname(filePath))) {
-                fs.mkdirSync(path.dirname(filePath), { recursive: true });
-            }
+            const filePath = path.join(getUploadsDir(), fileName);
 
             const stream = fs.createWriteStream(filePath);
             doc.pipe(stream);

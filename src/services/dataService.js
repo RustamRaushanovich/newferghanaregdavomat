@@ -5,11 +5,25 @@ const path = require('path');
 const fs = require('fs');
 const { normalizeKey } = require('../utils/topics');
 
+const os = require('os');
 const memCache = {
     viloyat: {},
     tuman: {}
 };
 const CACHE_TTL = 15000;
+
+function getExportDir() {
+    try {
+        const dir = path.resolve(__dirname, '../../assets');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        const testFile = path.join(dir, `.test_${Date.now()}`);
+        fs.writeFileSync(testFile, 'test');
+        fs.unlinkSync(testFile);
+        return dir;
+    } catch (e) {
+        return os.tmpdir();
+    }
+}
 
 async function getRawAttendanceRecords(date) {
     if (process.env.DATABASE_URL) {
@@ -349,8 +363,7 @@ async function exportToExcel(date) {
             });
         }
 
-        const assetsDir = path.resolve(__dirname, '../../assets');
-        if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
+        const assetsDir = getExportDir();
         const filePath = path.join(assetsDir, `HISOBOT_VILOYAT_${targetDate}.xlsx`);
         await workbook.xlsx.writeFile(filePath); return filePath;
     } catch (e) { console.error("Excel Error:", e); return null; }
@@ -404,7 +417,7 @@ async function exportDistrictExcel(district, date) {
         sumRow.eachCell(c => setStyle(c, { bold: true, fill: 'FFFFFF00' }));
 
         sheet1.getColumn(2).width = 30; for (let c = 3; c <= 22; c++) sheet1.getColumn(c).width = 11;
-        const filePath = path.join(path.resolve(__dirname, '../../assets'), `HISOBOT_${district.replace(/[^a-zA-Z0-9]/g, '_')}_${targetDate}.xlsx`);
+        const filePath = path.join(getExportDir(), `HISOBOT_${district.replace(/[^a-zA-Z0-9]/g, '_')}_${targetDate}.xlsx`);
         await workbook.xlsx.writeFile(filePath); return filePath;
     } catch (e) { console.error("District Excel Error:", e); return null; }
 }
@@ -588,7 +601,7 @@ async function exportWeeklyExcel(baseDate) {
         const header = sheet.addRow(headerRow); header.eachCell(c => setStyle(c, { bold: true, fill: 'FFC6E0B4' }));
         const res = await db.query(`SELECT district, count(DISTINCT school) as schools, sum(total_students)/count(DISTINCT date) as avg_students, sum(sababli_jami) as sababli, sum(sababsiz_jami) as sababsiz, sum(total_absent) as total_absent, avg(percent) as avg_p FROM attendance WHERE date >= $1 AND date <= $2 GROUP BY district ORDER BY avg_p DESC`, [startDate, endDate]);
         res.rows.forEach(r => { sheet.addRow([r.district, r.schools, Math.round(r.avg_students), r.sababli, r.sababsiz, r.total_absent, parseFloat(r.avg_p).toFixed(1) + '%']).eachCell(c => setStyle(c)); });
-        const assetsDir = path.resolve(__dirname, '../../assets');
+        const assetsDir = getExportDir();
         const filePath = path.join(assetsDir, `HAFTALIK_HISOBOT_${endDate}.xlsx`);
         await workbook.xlsx.writeFile(filePath); return filePath;
     } catch (e) { console.error("Weekly Excel Error:", e); return null; }
@@ -619,7 +632,7 @@ async function exportMonthlyExcel(baseDate, district = null) {
             const rowData = district ? [r.school, r.days, Math.round(r.avg_students), r.sababli, r.sababsiz, parseFloat(r.avg_p).toFixed(1) + '%'] : [r.district, r.schools, Math.round(r.avg_students), r.sababli, r.sababsiz, parseFloat(r.avg_p).toFixed(1) + '%'];
             sheet.addRow(rowData).eachCell(c => setStyle(c));
         });
-        const assetsDir = path.resolve(__dirname, '../../assets');
+        const assetsDir = getExportDir();
         const fileName = district ? `OYLIK_HISOBOT_${district.replace(/[^a-z0-9]/gi, '_')}_${year}_${month + 1}.xlsx` : `OYLIK_HISOBOT_VILOYAT_${year}_${month + 1}.xlsx`;
         const filePath = path.join(assetsDir, fileName); await workbook.xlsx.writeFile(filePath); return filePath;
     } catch (e) { console.error("Monthly Excel Error:", e); return null; }
@@ -695,7 +708,7 @@ async function exportXorijExcel() {
         sheet2.getColumn(6).width = 15; sheet2.getColumn(7).width = 15; sheet2.getColumn(8).width = 30;
         sheet2.getColumn(9).width = 20; sheet2.getColumn(11).width = 25; sheet2.getColumn(12).width = 40;
 
-        const assetsDir = path.resolve(__dirname, '../../assets');
+        const assetsDir = getExportDir();
         const filePath = path.join(assetsDir, `XORIJGA_KETGANLAR_${getFargonaTime().toISOString().split('T')[0]}.xlsx`);
         await workbook.xlsx.writeFile(filePath);
         return filePath;
@@ -705,7 +718,7 @@ async function exportXorijExcel() {
     }
 }
 
-async function exportSubscribersToExcel() {
+async function exportSubscribersToExcel(streamRes = null) {
     try {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Obunachilar va To\'lovlar');
@@ -987,7 +1000,15 @@ async function exportSubscribersToExcel() {
         receiptsSheet.getColumn(9).width = 18;
         receiptsSheet.getColumn(10).width = 20;
 
-        const assetsDir = path.resolve(__dirname, '../../assets');
+        if (streamRes) {
+            const fileName = `OBUNACHILAR_TOLOVLAR_${todayStr}.xlsx`;
+            streamRes.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            streamRes.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+            await workbook.xlsx.write(streamRes);
+            return true;
+        }
+
+        const assetsDir = getExportDir();
         const filePath = path.join(assetsDir, `OBUNACHILAR_TOLOVLAR_${todayStr}.xlsx`);
         await workbook.xlsx.writeFile(filePath);
         return filePath;

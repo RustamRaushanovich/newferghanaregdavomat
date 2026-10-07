@@ -9,14 +9,16 @@ function showAdminPanel(ctx) {
     if (uid === 65002404 || SUPER_ADMIN_IDS.map(Number).includes(uid)) {
         try {
             // Safe status check
-            let status = "🟢 O'CHIRILGAN";
-            if (db && db.settings && db.settings.vacation_mode) status = "🔴 YOQILGAN";
+            let status = "🔴 TA'TIL: OFF";
+            if (db && db.settings && db.settings.vacation_mode) status = "🟢 TA'TIL: ON";
+            let payStatus = "🔴 BEPUL: OFF";
+            if (db && db.settings && db.settings.bypass_payment_check) payStatus = "🟢 BEPUL: ON";
 
             const buttons = [
                 ["💳 To'lovlar & Obunalar (Excel)", "👥 Pro Ro'yxat"],
+                ["🔓 1-Kunga Bepul Davomat", `Ta'til: ${status}`],
                 ["➕ Promokod Yaratish", "❌ Pro Bekor Qilish"],
-                ["📢 Qarzdorlarga ABOROT", `Status: ${status}`],
-                ["📢 E'lon Yuborish", "📥 TEST REPORT"],
+                ["📢 Qarzdorlarga ABOROT", "📢 E'lon Yuborish"],
                 ["🔴 Ta'tilni YOQISH", "🟢 Ta'tilni O'CHIRISH"],
                 ["📢 Kiritmaganlar (Manual)", "📊 Grafika"],
                 ["📥 Excel Yuklab olish", "🔄 Bazani yangilash"],

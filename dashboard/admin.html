@@ -162,12 +162,80 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 15px;
-            margin-bottom: 10px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        .toggle-container:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
+        /* Modern iOS-Style Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 28px;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+        input:checked + .slider {
+            background-color: #22c55e;
+            border-color: #4ade80;
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.45);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .toggle-status-text {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .toggle-status-on {
+            color: #4ade80;
+            background: rgba(34, 197, 94, 0.18);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+        }
+        .toggle-status-off {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.18);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
 
         .stats-item {
             display: flex;
@@ -183,24 +251,52 @@
         .quick-links {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
         }
 
         .quick-link {
             background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-radius: 15px;
+            padding: 16px 12px;
+            border-radius: 16px;
             text-decoration: none;
             color: white;
             text-align: center;
-            font-size: 0.85rem;
-            border: 1px solid transparent;
-            transition: 0.3s;
+            font-size: 0.88rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .quick-link:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(99, 102, 241, 0.15);
             border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: flex !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                justify-content: flex-start !important;
+                gap: 6px !important;
+                padding: 6px 10px !important;
+            }
+            .nav-links::-webkit-scrollbar { display: none; }
+            .nav-item {
+                flex-shrink: 0 !important;
+                min-width: 65px !important;
+            }
+            .quick-links {
+                grid-template-columns: 1fr 1fr !alignment;
+                gap: 10px;
+            }
         }
 
         .toast {
@@ -282,39 +378,84 @@
             </div>
 
             <!-- System Controls -->
-            <div class="card">
+            <div class="card" id="systemSettingsCard">
                 <h3><i class="fas fa-cogs"></i> Tizim Sozlamalari</h3>
 
+                <!-- 1. Ta'til rejimi -->
                 <div class="toggle-container">
                     <div>
-                        <div style="font-weight: 600;">Ta'til rejimi (Holiday)</div>
-                        <div style="font-size: 0.8rem; color: #64748b;">Bot xabarlarini to'xtatadi</div>
+                        <div style="font-weight: 600; color: #f8fafc;">Ta'til rejimi (Holiday)</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Bot xabarlarini to'xtatadi</div>
                     </div>
-                    <button id="toggleVacation" class="btn btn-danger">O'chirilgan</button>
+                    <div style="display: flex; align-items: center;">
+                        <span id="badgeVacation" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleVacation" onchange="handleToggleChange('vacation_mode', this.checked, 'badgeVacation')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="toggle-container">
+                <!-- 2. 1 Kunga to'lovsiz davomat (NEW!) -->
+                <div class="toggle-container" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.25);">
                     <div>
-                        <div style="font-weight: 600;">Manzil yig'ish</div>
-                        <div style="font-size: 0.8rem; color: #64748b;">Barcha school koordinatalari</div>
+                        <div style="font-weight: 700; color: #38bdf8; display:flex; align-items:center; gap:6px;">
+                            <i class="fas fa-unlock-alt"></i> 1 kunga to'lovsiz davomat (Free Day)
+                        </div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Bir kunga avtomatik to'lov tekshiruvini o'chirish (barcha maktablarga bepul kiritish)</div>
                     </div>
-                    <button id="toggleLocation" class="btn btn-success">Yoqilgan</button>
+                    <div style="display: flex; align-items: center;">
+                        <span id="badgeBypassPayment" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleBypassPayment" onchange="handleToggleChange('bypass_payment_check', this.checked, 'badgeBypassPayment')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
 
+                <!-- 3. Manzil yig'ish -->
                 <div class="toggle-container">
                     <div>
-                        <div style="font-weight: 600;">Geolokatsiya tekshiruvi</div>
-                        <div style="font-size: 0.8rem; color: #64748b;">Kiritishda joylashuvni talab qilish</div>
+                        <div style="font-weight: 600; color: #f8fafc;">Manzil yig'ish</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Barcha school koordinatalari</div>
                     </div>
-                    <button id="toggleGeoCheck" class="btn btn-danger">O'chirilgan</button>
+                    <div style="display: flex; align-items: center;">
+                        <span id="badgeLocation" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleLocation" onchange="handleToggleChange('location_collection_mode', this.checked, 'badgeLocation')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
 
+                <!-- 4. Geolokatsiya tekshiruvi -->
                 <div class="toggle-container">
                     <div>
-                        <div style="font-weight: 600;">⚠️ Texnik ishlar (Maintenance)</div>
-                        <div style="font-size: 0.8rem; color: #64748b;">Dashboardni vaqtincha yopish</div>
+                        <div style="font-weight: 600; color: #f8fafc;">Geolokatsiya tekshiruvi</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Kiritishda joylashuvni talab qilish</div>
                     </div>
-                    <button id="toggleMaintenance" class="btn btn-danger">O'chirilgan</button>
+                    <div style="display: flex; align-items: center;">
+                        <span id="badgeGeoCheck" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleGeoCheck" onchange="handleToggleChange('check_location', this.checked, 'badgeGeoCheck')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 5. Texnik ishlar (Maintenance) -->
+                <div class="toggle-container">
+                    <div>
+                        <div style="font-weight: 600; color: #f8fafc;">⚠️ Texnik ishlar (Maintenance)</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Dashboardni vaqtincha yopish</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span id="badgeMaintenance" class="toggle-status-text toggle-status-off">🔴 O'chirilgan</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleMaintenance" onchange="handleToggleChange('maintenance_mode', this.checked, 'badgeMaintenance')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -391,13 +532,25 @@
             </div>
 
             <!-- Quick Navigation -->
-            <div class="card">
+            <div class="card" id="quickLinksCard">
                 <h3><i class="fas fa-link"></i> Tezkor Havolalar</h3>
                 <div class="quick-links">
-                    <a href="#subscriptionsManagerCard" class="quick-link"><i class="fas fa-calendar-check" style="color:#38bdf8;"></i><br>Obunalar / Maktablar</a>
-                    <a href="#receiptsCard" class="quick-link"><i class="fas fa-receipt" style="color:#10b981;"></i><br>To'lov Cheklari</a>
-                    <a href="inspektor.html" class="quick-link"><i class="fas fa-user-shield"></i><br>Inspektorlar</a>
-                    <a href="dashboard.html?tab=reports" class="quick-link"><i class="fas fa-file-excel"></i><br>Hisobotlar</a>
+                    <button type="button" onclick="scrollToQuickLink('subscriptionsManagerCard'); loadSubscriptions();" class="quick-link" style="border:none; cursor:pointer;">
+                        <i class="fas fa-calendar-check" style="color:#38bdf8; font-size:1.5rem;"></i>
+                        <span style="font-weight:600;">Obunalar / Maktablar</span>
+                    </button>
+                    <button type="button" onclick="scrollToQuickLink('receiptsCard'); loadReceipts();" class="quick-link" style="border:none; cursor:pointer;">
+                        <i class="fas fa-receipt" style="color:#10b981; font-size:1.5rem;"></i>
+                        <span style="font-weight:600;">To'lov Cheklari</span>
+                    </button>
+                    <a href="inspektor.html" class="quick-link">
+                        <i class="fas fa-user-shield" style="color:#f59e0b; font-size:1.5rem;"></i>
+                        <span style="font-weight:600;">Inspektorlar</span>
+                    </a>
+                    <button type="button" onclick="downloadSubscribersExcel()" class="quick-link" style="border:none; cursor:pointer;">
+                        <i class="fas fa-file-excel" style="color:#a855f7; font-size:1.5rem;"></i>
+                        <span style="font-weight:600;">Hisobotlar (Excel)</span>
+                    </button>
                 </div>
                 <div style="margin-top: 15px; font-size: 0.8rem; color: #64748b; text-align: center;">
                     Boshqa barcha funksiyalar Botdagi Admin Panelda mavjud.
@@ -704,56 +857,71 @@
         }
 
         function updateUI(s) {
-            const vBtn = document.getElementById('toggleVacation');
-            vBtn.textContent = s.vacation_mode ? 'Yoqilgan' : 'O\'chirilgan';
-            vBtn.className = 'btn ' + (s.vacation_mode ? 'btn-success' : 'btn-danger');
+            setToggleState('toggleVacation', 'badgeVacation', s.vacation_mode);
+            setToggleState('toggleBypassPayment', 'badgeBypassPayment', s.bypass_payment_check);
+            setToggleState('toggleLocation', 'badgeLocation', s.location_collection_mode);
+            setToggleState('toggleGeoCheck', 'badgeGeoCheck', s.check_location);
+            setToggleState('toggleMaintenance', 'badgeMaintenance', s.maintenance_mode);
+        }
 
-            const lBtn = document.getElementById('toggleLocation');
-            lBtn.textContent = s.location_collection_mode ? 'Yoqilgan' : 'O\'chirilgan';
-            lBtn.className = 'btn ' + (s.location_collection_mode ? 'btn-success' : 'btn-danger');
-
-            const gBtn = document.getElementById('toggleGeoCheck');
-            gBtn.textContent = s.check_location ? 'Yoqilgan' : 'O\'chirilgan';
-            gBtn.className = 'btn ' + (s.check_location ? 'btn-success' : 'btn-danger');
-
-            const mBtn = document.getElementById('toggleMaintenance');
-            if (mBtn) {
-                mBtn.textContent = s.maintenance_mode ? 'Yoqilgan' : 'O\'chirilgan';
-                mBtn.className = 'btn ' + (s.maintenance_mode ? 'btn-success' : 'btn-danger');
+        function setToggleState(inputId, badgeId, isChecked) {
+            const input = document.getElementById(inputId);
+            const badge = document.getElementById(badgeId);
+            if (input) input.checked = !!isChecked;
+            if (badge) {
+                badge.textContent = isChecked ? '🟢 Yoqilgan' : '🔴 O\'chirilgan';
+                badge.className = 'toggle-status-text ' + (isChecked ? 'toggle-status-on' : 'toggle-status-off');
             }
+        }
+
+        async function handleToggleChange(key, isChecked, badgeId) {
+            if (key === 'maintenance_mode' && isChecked) {
+                if (!confirm("DIQQAT! Texnik ishlar rejimini yoqsangiz, superadminlardan boshqa barcha uchun dashboard yopiladi. Tasdiqlaysizmi?")) {
+                    document.getElementById('toggleMaintenance').checked = false;
+                    setToggleState('toggleMaintenance', badgeId, false);
+                    return;
+                }
+            }
+            if (key === 'bypass_payment_check' && isChecked) {
+                showToast("1-kunga to'lovsiz davomat kiritish YOQILDI");
+            }
+            setToggleState('', badgeId, isChecked);
+            await updateSetting(key, isChecked);
         }
 
         async function updateSetting(key, val) {
-            const res = await fetch('/api/admin/settings', {
-                method: 'POST',
-                headers: { 'Authorization': token },
-                body: JSON.stringify({ [key]: val })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                updateUI(data.settings);
-                showToast("Sozlamalar saqlandi");
-                addLog(`[ACTION] ${key} holati ${val ? 'YOQILDI' : 'OCHIRILDI'}`);
+            try {
+                const res = await fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [key]: val })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    updateUI(data.settings);
+                    showToast("Sozlamalar muvaffaqiyatli saqlandi");
+                    addLog(`[ACTION] ${key} holati -> ${val ? 'YOQILDI (ON)' : 'O\'CHIRILDI (OFF)'}`);
+                } else {
+                    showToast("Sozlamalarni saqlashda xatolik!", true);
+                }
+            } catch(e) {
+                showToast("Tarmoq xatosi: " + e.message, true);
             }
         }
 
-        document.getElementById('toggleVacation').onclick = function () {
-            const state = this.textContent === 'O\'chirilgan';
-            updateSetting('vacation_mode', state);
-        };
-        document.getElementById('toggleLocation').onclick = function () {
-            const state = this.textContent === 'O\'chirilgan';
-            updateSetting('location_collection_mode', state);
-        };
-        document.getElementById('toggleGeoCheck').onclick = function () {
-            const state = this.textContent === 'O\'chirilgan';
-            updateSetting('check_location', state);
-        };
-        document.getElementById('toggleMaintenance').onclick = function () {
-            const state = this.textContent === 'O\'chirilgan';
-            if (state && !confirm("DIQQAT! Texnik ishlar rejimini yoqsangiz, superadminlardan boshqa barcha uchun dashboard yopiladi. Tasdiqlaysizmi?")) return;
-            updateSetting('maintenance_mode', state);
-        };
+        function scrollToQuickLink(targetId) {
+            const el = document.getElementById(targetId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                el.style.transition = '0.5s';
+                el.style.boxShadow = '0 0 30px rgba(99, 102, 241, 0.8)';
+                el.style.borderColor = '#6366f1';
+                setTimeout(() => {
+                    el.style.boxShadow = '';
+                    el.style.borderColor = '';
+                }, 2000);
+            }
+        }
 
         // Broadcast logic
         document.getElementById('broadcastForm').onsubmit = async (e) => {
